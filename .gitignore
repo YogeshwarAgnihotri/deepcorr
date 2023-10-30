@@ -1,0 +1,6 @@
+# ignore archives
+*.pickle
+DeepCorr.json
+
+# ignore dataset folder and subfolders
+datasets/
