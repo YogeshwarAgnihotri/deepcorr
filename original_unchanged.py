@@ -9,9 +9,6 @@ import numpy as np
 import tqdm
 import pickle
 
-import tensorflow as tf 
-import gc
-
 
 # In[2]:
 
@@ -35,7 +32,7 @@ all_runs={'8872':'192.168.122.117','8802':'192.168.122.117','8873':'192.168.122.
 dataset=[]
 
 for name in all_runs:
-    dataset+=pickle.load(open('dataset/%s_tordata300.pickle'%name))
+    dataset+=pickle.load(open('./%s_tordata300.pickle'%name))
 
 if TRAINING:
     
@@ -183,6 +180,18 @@ def generate_data(dataset,train_index,test_index,flow_size):
     return l2s, labels,l2s_test,labels_test
 
 
+    
+            
+            
+            
+    
+
+
+
+# In[5]:
+
+
+import tensorflow as tf 
 
 
 # In[6]:
@@ -349,15 +358,14 @@ if TRAINING:
     with tf.Session(graph=graph) as session:
         # We must initialize all variables before we use them.
         session.run(init)
+        
 
-        l2s, labels, l2s_test, labels_test = generate_data(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size)
-        rr = range(len(l2s))
-
-        for epoch in xrange(num_epochs):
-
+        for epoch in xrange(num_epochs ):
+            l2s,labels,l2s_test,labels_test=generate_data(dataset=dataset,train_index=train_index,test_index=test_index,flow_size=flow_size)
+            rr= range(len(l2s))
             np.random.shuffle(rr)
-            l2s = l2s[rr]
-            labels = labels[rr]
+            l2s=l2s[rr]
+            labels=labels[rr]
 
 
             average_loss = 0
@@ -378,7 +386,7 @@ if TRAINING:
 
                 feed_dict = {train_flow_before: batch_flow_before,
                                 train_label:batch_label,
-                            dropout_keep_prob:0.6}
+                             dropout_keep_prob:0.6}
                 # We perform one update step by evaluating the optimizer op (including it
                 # in the list of returned values for session.run()
 
@@ -432,7 +440,7 @@ if TRAINING:
                     acc= float(tp)/float(tp+fp)
                     if float(tp)/float(tp+fp)>0.8:      
                         print 'saving...'
-                        save_path = saver.save(session, "./saved_models/tor_199_epoch%d_step%d_acc%.2f.ckpt"%(epoch,step,acc))
+                        save_path = saver.save(session, "/mnt/nfs/work1/amir/milad/tor_199_epoch%d_step%d_acc%.2f.ckpt"%(epoch,step,acc))
                         print 'saved'
             print 'Epoch',epoch
             #save_path = saver.save(session, "/mnt/nfs/scratch1/milad/model_diff_large_1e4_epoch%d.ckpt"%(epoch))
@@ -441,7 +449,7 @@ if TRAINING:
 else:
     with tf.Session(graph=graph) as session:
         name=raw_input('model name')
-        saver.restore(session, "./saved_models/%s"%name)
+        saver.restore(session, "/mnt/nfs/work1/amir/milad/%s"%name)
         print("Model restored.")
         corrs=np.zeros((len(test_index),len(test_index)))
         batch=[]
@@ -475,3 +483,8 @@ else:
                 xj+=1
             xi+=1
         np.save(open('correlation_values_test.np','w'),corrs)
+                        
+                    
+                    
+                    
+        
