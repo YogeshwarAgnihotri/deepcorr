@@ -436,7 +436,6 @@ if TRAINING:
                         print 'saved'
             print 'Epoch',epoch
             #save_path = saver.save(session, "/mnt/nfs/scratch1/milad/model_diff_large_1e4_epoch%d.ckpt"%(epoch))
-            # test
 
             #t.join()
 else:
