@@ -428,7 +428,8 @@ if TRAINING:
                             tp+=1
                         else:
                             fp+=1
-                    print tp,fp
+                    print "True Positive: ", tp
+                    print "False Positive: ", fp
                     acc= float(tp)/float(tp+fp)
                     if float(tp)/float(tp+fp)>0.8:      
                         print 'saving...'
