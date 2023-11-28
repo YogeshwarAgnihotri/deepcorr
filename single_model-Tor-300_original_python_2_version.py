@@ -11,10 +11,11 @@ import pickle
 
 import tensorflow as tf 
 import gc
+import os
 
 
 # In[2]:
-
+os.environ["CUDA_VISIBLE_DEVICES"] = "0";
 
 flow_size=300
 is_training=raw_input('train?')
@@ -41,6 +42,7 @@ if TRAINING:
     
     
     len_tr=len(dataset)
+    print("Dataset length: ", len_tr)
     train_ratio=float(len_tr-6000)/float(len_tr)
     rr= range(len(dataset))
     np.random.shuffle(rr)
@@ -59,16 +61,75 @@ else:
 negetive_samples=199
 
 
+#TODO find out how to just make l2s the size we need instead of making it the full size of the traing dataset*neg_samples pro
 # In[4]:
+def train_data_generator(dataset, train_index, flow_size, batch_size):
+    global negetive_samples
 
+    all_samples_length=len(train_index)
+    labels=np.zeros((all_samples_length*(negetive_samples+1),1))
+    l2s=np.zeros((all_samples_length*(negetive_samples+1),8,flow_size,1))
+    
+    num_steps= (len(l2s)//batch_size)-1
+
+    for step in xrange(num_steps):
+
+        index=0
+        random_ordering=[]+train_index
+        
+        start_ind = step*batch_size
+        end_ind = ((step + 1) *batch_size)
+        
+        for i in range(start_ind,end_ind):
+            #[]#list(lsh.find_k_nearest_neighbors((Y_train[i]/ np.linalg.norm(Y_train[i])).astype(np.float64),(50)))
+
+            l2s[index,0,:,0]=np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0
+            l2s[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
+            l2s[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
+            l2s[index,3,:,0]=np.array(dataset[i]['here'][0]['->'][:flow_size])*1000.0
+
+            l2s[index,4,:,0]=np.array(dataset[i]['here'][1]['<-'][:flow_size])/1000.0
+            l2s[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
+            l2s[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
+            l2s[index,7,:,0]=np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0
+
+
+            if index % (negetive_samples+1) !=0:
+                print index , len(nears)
+                raise
+            labels[index,0]=1
+            m=0
+            index+=1
+            np.random.shuffle(random_ordering)
+            for idx in random_ordering:
+                if idx==i or m>(negetive_samples-1):
+                    continue
+
+                m+=1
+
+                l2s[index,0,:,0]=np.array(dataset[idx]['here'][0]['<-'][:flow_size])*1000.0
+                l2s[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
+                l2s[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
+                l2s[index,3,:,0]=np.array(dataset[idx]['here'][0]['->'][:flow_size])*1000.0
+
+                l2s[index,4,:,0]=np.array(dataset[idx]['here'][1]['<-'][:flow_size])/1000.0
+                l2s[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
+                l2s[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
+                l2s[index,7,:,0]=np.array(dataset[idx]['here'][1]['->'][:flow_size])/1000.0
+
+                #l2s[index,0,:,0]=Y_train[i]#np.concatenate((Y_train[i],X_train[idx]))#(Y_train[i]*X_train[idx])/(np.linalg.norm(Y_train[i])*np.linalg.norm(X_train[idx]))
+                #l2s[index,1,:,0]=X_train[idx]
+
+
+
+                labels[index,0]=0
+                index+=1
+        
+        yield l2s[start_ind:end_ind,:], labels[start_ind:end_ind]
 
 def generate_data(dataset,train_index,test_index,flow_size):
     
-
-
     global negetive_samples
-
-
 
     all_samples=len(train_index)
     labels=np.zeros((all_samples*(negetive_samples+1),1))
@@ -76,7 +137,7 @@ def generate_data(dataset,train_index,test_index,flow_size):
 
     index=0
     random_ordering=[]+train_index
-    for i in tqdm.tqdm( train_index):
+    for i in tqdm.tqdm(train_index):
         #[]#list(lsh.find_k_nearest_neighbors((Y_train[i]/ np.linalg.norm(Y_train[i])).astype(np.float64),(50)))
 
         l2s[index,0,:,0]=np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0
@@ -181,12 +242,128 @@ def generate_data(dataset,train_index,test_index,flow_size):
 
         index+=1
     return l2s, labels,l2s_test,labels_test
+    
+def generate_data_memmap(dataset,train_index,test_index,flow_size):
+    
+    global negetive_samples
+
+    all_samples=len(train_index)
+    
+    # Memmap creation
+    labels = np.memmap("./temp/.labels", dtype=np.float32, mode='w+', shape=(all_samples*(negetive_samples+1),1))
+    #labels=np.zeros((all_samples*(negetive_samples+1),1))
+    l2s = np.memmap("./temp/.l2s", dtype=np.float32, mode='w+', shape=(all_samples*(negetive_samples+1),8,flow_size,1))
+    #l2s=np.zeros((all_samples*(negetive_samples+1),8,flow_size,1))
+
+    index=0
+    random_ordering=[]+train_index
+    for i in tqdm.tqdm(train_index):
+        #[]#list(lsh.find_k_nearest_neighbors((Y_train[i]/ np.linalg.norm(Y_train[i])).astype(np.float64),(50)))
+
+        l2s[index,0,:,0]=np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0
+        l2s[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
+        l2s[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
+        l2s[index,3,:,0]=np.array(dataset[i]['here'][0]['->'][:flow_size])*1000.0
+
+        l2s[index,4,:,0]=np.array(dataset[i]['here'][1]['<-'][:flow_size])/1000.0
+        l2s[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
+        l2s[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
+        l2s[index,7,:,0]=np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0
+
+
+        if index % (negetive_samples+1) !=0:
+            print index , len(nears)
+            raise
+        labels[index,0]=1
+        m=0
+        index+=1
+        np.random.shuffle(random_ordering)
+        for idx in random_ordering:
+            if idx==i or m>(negetive_samples-1):
+                continue
+
+            m+=1
+
+            l2s[index,0,:,0]=np.array(dataset[idx]['here'][0]['<-'][:flow_size])*1000.0
+            l2s[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
+            l2s[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
+            l2s[index,3,:,0]=np.array(dataset[idx]['here'][0]['->'][:flow_size])*1000.0
+
+            l2s[index,4,:,0]=np.array(dataset[idx]['here'][1]['<-'][:flow_size])/1000.0
+            l2s[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
+            l2s[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
+            l2s[index,7,:,0]=np.array(dataset[idx]['here'][1]['->'][:flow_size])/1000.0
+
+            #l2s[index,0,:,0]=Y_train[i]#np.concatenate((Y_train[i],X_train[idx]))#(Y_train[i]*X_train[idx])/(np.linalg.norm(Y_train[i])*np.linalg.norm(X_train[idx]))
+            #l2s[index,1,:,0]=X_train[idx]
+
+
+
+            labels[index,0]=0
+            index+=1
 
 
 
 
-# In[6]:
+    #lsh.setup((X_test / np.linalg.norm(X_test,axis=1,keepdims=True)) .astype(np.float64))
+    index_hard=0
+    num_hard_test=0
+    l2s_test = np.memmap("./temp/.l2s_test", dtype=np.float32, mode='w+', shape=(len(test_index)*(negetive_samples+1),8,flow_size,1))
+    labels_test = np.memmap("./temp/.labels_test", dtype=np.float32, mode='w+', shape=(len(test_index)*(negetive_samples+1)))
+    #l2s_test=np.zeros((len(test_index)*(negetive_samples+1),8,flow_size,1))
+    #labels_test=np.zeros((len(test_index)*(negetive_samples+1)))
+    #l2s_test_hard=np.zeros((num_hard_test*num_hard_test,2,flow_size,1))
+    index=0
+    random_test=[]+test_index
 
+    for i in tqdm.tqdm(test_index):
+        #list(lsh.find_k_nearest_neighbors((Y_test[i]/ np.linalg.norm(Y_test[i])).astype(np.float64),(50)))
+
+
+
+        if index % (negetive_samples+1) !=0:
+            print index, nears
+            raise 
+        m=0
+
+        np.random.shuffle(random_test)
+        for idx in random_test:
+            if idx==i or m>(negetive_samples-1):
+                continue
+
+            m+=1
+            l2s_test[index,0,:,0]=np.array(dataset[idx]['here'][0]['<-'][:flow_size])*1000.0
+            l2s_test[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
+            l2s_test[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
+            l2s_test[index,3,:,0]=np.array(dataset[idx]['here'][0]['->'][:flow_size])*1000.0
+
+            l2s_test[index,4,:,0]=np.array(dataset[idx]['here'][1]['<-'][:flow_size])/1000.0
+            l2s_test[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
+            l2s_test[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
+            l2s_test[index,7,:,0]=np.array(dataset[idx]['here'][1]['->'][:flow_size])/1000.0
+            labels_test[index]=0
+            index+=1
+
+        l2s_test[index,0,:,0]=np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0
+        l2s_test[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
+        l2s_test[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
+        l2s_test[index,3,:,0]=np.array(dataset[i]['here'][0]['->'][:flow_size])*1000.0
+
+        l2s_test[index,4,:,0]=np.array(dataset[i]['here'][1]['<-'][:flow_size])/1000.0
+        l2s_test[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
+        l2s_test[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
+        l2s_test[index,7,:,0]=np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0
+        #l2s_test[index,2,:,0]=dataset[i]['there'][0]['->'][:flow_size]
+        #l2s_test[index,3,:,0]=dataset[i]['here'][0]['<-'][:flow_size]
+
+        #l2s_test[index,0,:,1]=dataset[i]['here'][1]['->'][:flow_size]
+        #l2s_test[index,1,:,1]=dataset[i]['there'][1]['<-'][:flow_size]
+        #l2s_test[index,2,:,1]=dataset[i]['there'][1]['->'][:flow_size]
+        #l2s_test[index,3,:,1]=dataset[i]['here'][1]['<-'][:flow_size]
+        labels_test[index]=1
+
+        index+=1
+    return l2s, labels,l2s_test,labels_test
 
 
 def model(flow_before,dropout_keep_prob):
@@ -350,11 +527,12 @@ if TRAINING:
         # We must initialize all variables before we use them.
         session.run(init)
 
-        l2s, labels, l2s_test, labels_test = generate_data(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size)
-        rr = range(len(l2s))
+        #TODO Check before running that everything is the same as the origial
 
         for epoch in xrange(num_epochs):
-
+            l2s, labels, l2s_test, labels_test = generate_data_memmap(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size)
+            rr = range(len(l2s))
+            print "l2s size: ", len(l2s)
             np.random.shuffle(rr)
             l2s = l2s[rr]
             labels = labels[rr]
@@ -383,6 +561,8 @@ if TRAINING:
                 # in the list of returned values for session.run()
 
                 _, loss_val,summary = session.run([optimizer, loss, summary_op], feed_dict=feed_dict)
+
+
 
 
 
