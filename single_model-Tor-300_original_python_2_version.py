@@ -43,7 +43,8 @@ if TRAINING:
     
     len_tr=len(dataset)
     print("Dataset length: ", len_tr)
-    train_ratio=float(len_tr-6000)/float(len_tr)
+    #train_ratio=float(len_tr-6000)/float(len_tr)
+    train_ratio=0.8
     rr= range(len(dataset))
     np.random.shuffle(rr)
 
