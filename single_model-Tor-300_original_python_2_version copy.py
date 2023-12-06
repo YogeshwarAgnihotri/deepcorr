@@ -21,9 +21,14 @@ dataset=[]
 for name in all_runs:
     dataset+=pickle.load(open('dataset/%s_tordata300.pickle'%name))
 
+    #if more data is needed, uncomment the following lines
+    #dataset+=pickle.load(open('../dataset/%s_tordata.pickle'%name))
+    #dataset+=pickle.load(open('../dataset/%s_tordata400.pickle'%name))
+    #dataset+=pickle.load(open('../dataset/%s_tordata500.pickle'%name))
+
 if TRAINING:
     
-    
+
     len_tr=len(dataset)
     print("Dataset length: ", len_tr)
     #train_ratio=float(len_tr-6000)/float(len_tr)
@@ -35,6 +40,7 @@ if TRAINING:
     test_index= rr[int(len_tr*train_ratio):] #range(len(dataset_test)) # #
     pickle.dump(test_index,open('test_index300.pickle','w'))
 else:
+    #this line limits the training data to 1000 samples
     test_index=pickle.load(open('test_index300.pickle'))[:1000]
 
 
