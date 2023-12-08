@@ -1,6 +1,10 @@
 # ignore archives
 *.pickle
 DeepCorr.json
+*.pyc
 
 # ignore dataset folder and subfolders
 datasets/
+logs/
+saved_models/
+temp/
