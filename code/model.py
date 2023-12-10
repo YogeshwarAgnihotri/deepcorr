@@ -1,4 +1,6 @@
 import tensorflow as tf 
+import datetime
+import os
 
 def model(flow_before,dropout_keep_prob,flow_size):
     last_layer=flow_before
@@ -53,11 +55,7 @@ def model_cnn(flow_before,dropout_keep_prob,batch_size):
     return last_layer
 
 
-def build_graph(batch_size, flow_size, learn_rate, training: bool):
-    if training:
-        batch_size=256
-        learn_rate=0.0001
-
+def build_graph_training(batch_size, flow_size, learn_rate):
         graph = tf.Graph()
         with graph.as_default():
             train_flow_before = tf.placeholder(tf.float32, shape=[batch_size, 8,flow_size,1],name='flow_before_placeholder')
@@ -67,7 +65,7 @@ def build_graph(batch_size, flow_size, learn_rate, training: bool):
             # Look up embeddings for inputs.
 
 
-            y2 = model_cnn(train_flow_before, dropout_keep_prob)
+            y2 = model_cnn(train_flow_before, dropout_keep_prob, batch_size)
             predict=tf.nn.sigmoid(y2)
             # Compute the average NCE loss for the batch.
             # tf.nce_loss automatically draws a new sample of the negative labels each
@@ -94,34 +92,32 @@ def build_graph(batch_size, flow_size, learn_rate, training: bool):
             #    tf.summary.scalar('gradients', gradients)
             summary_op = tf.summary.merge_all()
 
-
-
             # Add variable initializer.
             init = tf.global_variables_initializer()
 
             saver = tf.train.Saver()
 
-            return train_flow_before, train_label, dropout_keep_prob, loss, optimizer, summary_op, init, saver, predict
+            return train_flow_before, train_label, dropout_keep_prob, loss, optimizer, summary_op, init, saver, predict, graph
 
-    else:
-        #batch_size=2804/2
-        batch_size=256
 
-        graph = tf.Graph()
-        with graph.as_default():
-            train_flow_before = tf.placeholder(tf.float32, shape=[batch_size, 8,flow_size,1],name='flow_before_placeholder')
-            train_label = tf.placeholder(tf.float32,name='label_placeholder',shape=[batch_size,1])
-            dropout_keep_prob = tf.placeholder(tf.float32,name='dropout_placeholder')
-            # train_correlated_var = tf.Variable(train_correlated, trainable=False)
-            # Look up embeddings for inputs.
+def build_graph_testing(batch_size, flow_size):
+    graph = tf.Graph()
+    with graph.as_default():
+        train_flow_before = tf.placeholder(tf.float32, shape=[batch_size, 8,flow_size,1],name='flow_before_placeholder')
+        train_label = tf.placeholder(tf.float32,name='label_placeholder',shape=[batch_size,1])
+        dropout_keep_prob = tf.placeholder(tf.float32,name='dropout_placeholder')
+        # train_correlated_var = tf.Variable(train_correlated, trainable=False)
+        # Look up embeddings for inputs.
 
 
 
-            y2 = model_cnn(train_flow_before, dropout_keep_prob)
-            predict=tf.nn.sigmoid(y2)
-            # Compute the average NCE loss for the batch.
-            # tf.nce_loss automatically draws a new sample of the negative labels each
-            # time we evaluate the loss.
-            saver = tf.train.Saver()
+        y2 = model_cnn(train_flow_before, dropout_keep_prob, batch_size)
+        predict=tf.nn.sigmoid(y2)
+        # Compute the average NCE loss for the batch.
+        # tf.nce_loss automatically draws a new sample of the negative labels each
+        # time we evaluate the loss.
+        saver = tf.train.Saver()
 
-            return train_flow_before, train_label, dropout_keep_prob, saver, predict
+        writer = tf.summary.FileWriter('./logs/tf_log/noise_classifier/allcir_300_'+str(datetime.datetime.now()), graph=graph)
+
+        return train_flow_before, train_label, dropout_keep_prob, saver, predict, graph

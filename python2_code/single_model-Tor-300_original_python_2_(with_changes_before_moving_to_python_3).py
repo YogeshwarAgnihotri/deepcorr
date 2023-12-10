@@ -19,7 +19,7 @@ all_runs={'8872':'192.168.122.117','8802':'192.168.122.117','8873':'192.168.122.
 dataset=[]
 
 for name in all_runs:
-    dataset+=pickle.load(open('dataset/%s_tordata300.pickle'%name))
+    dataset+=pickle.load( open('/home/yagnihotri/projects/deepcorr/dataset/%s_tordata300.pickle'%name))
 
     #if more data is needed, uncomment the following lines
     #dataset+=pickle.load(open('../dataset/%s_tordata.pickle'%name))

@@ -3,9 +3,17 @@ import tqdm
 import os
 import pickle
 
-def generate_data_memmap(dataset,train_index,test_index,flow_size, path_to_memmap_files, negetive_samples=199):
+from utils import check_create_path
+
+def generate_data_memmap(dataset,train_index,test_index,flow_size, run_folder_path, negetive_samples=199):
 
     all_samples=len(train_index)
+
+    # create temp folder for memmap files
+    path_to_memmap_files = os.path.join(run_folder_path, "temp")
+
+    # it shouldnt exits since we create a new folder for each run. so create a new folder called temp in the run_folder_path
+    check_create_path(path_to_memmap_files)
 
     # creating paths for memmap files
     labels_path = os.path.join(path_to_memmap_files, ".labels")
@@ -40,7 +48,8 @@ def generate_data_memmap(dataset,train_index,test_index,flow_size, path_to_memma
 
 
         if index % (negetive_samples+1) !=0:
-            print index , len(nears)
+            #print(index, len(nears))
+            print(index)
             raise
         labels[index,0]=1
         m=0
@@ -90,7 +99,8 @@ def generate_data_memmap(dataset,train_index,test_index,flow_size, path_to_memma
         #list(lsh.find_k_nearest_neighbors((Y_test[i]/ np.linalg.norm(Y_test[i])).astype(np.float64),(50)))
 
         if index % (negetive_samples+1) !=0:
-            print index, nears
+            #print(index, nears)
+            print(index)
             raise 
         m=0
 

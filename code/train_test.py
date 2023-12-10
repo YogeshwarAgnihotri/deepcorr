@@ -11,7 +11,7 @@ import datetime
 # with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
 # with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
 #saver = tf.train.Saver()
-def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetive_samples, batch_size, train_flow_before, train_label, dropout_keep_prob, loss, optimizer, summary_op, init, saver, predict, graph):
+def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetive_samples, batch_size, train_flow_before, train_label, dropout_keep_prob, loss, optimizer, summary_op, init, saver, predict, graph, run_folder_path):
     writer = tf.summary.FileWriter('./logs/tf_log/noise_classifier/allcir_300_'+str(datetime.datetime.now()), graph=graph)
     
     with tf.Session(graph=graph) as session:
@@ -20,10 +20,10 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
 
         #TODO Check before running that everything is the same as the origial
 
-        for epoch in xrange(num_epochs):
-            l2s, labels, l2s_test, labels_test = data_processing.generate_data_memmap(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size)
-            rr = range(len(l2s))
-            print "l2s size: ", len(l2s)
+        for epoch in range(num_epochs):
+            l2s, labels, l2s_test, labels_test = data_processing.generate_data_memmap(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size, run_folder_path=run_folder_path, negetive_samples=negetive_samples)
+            rr= list(range(len(l2s)))
+            print("l2s size: ", len(l2s))
             np.random.shuffle(rr)
             l2s = l2s[rr]
             labels = labels[rr]
@@ -33,11 +33,11 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
             new_epoch=True
             num_steps= (len(l2s)//batch_size)-1
 
-            for step in xrange(num_steps):
+            for step in range(num_steps):
                 start_ind = step*batch_size
                 end_ind = ((step + 1) *batch_size)
                 if end_ind < start_ind:
-                    print 'HOOY'
+                    print('HOOY')
                     continue
 
                 else:
@@ -78,14 +78,13 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
 
                     num_steps_test= (len(l2s_test)//batch_size)-1
                     Y_est=np.zeros((batch_size*(num_steps_test+1)))
-                    for step in xrange(num_steps_test):
+                    for step in range(num_steps_test):
                         start_ind = step*batch_size
                         end_ind = ((step + 1) *batch_size)
                         test_batch_flow_before=l2s_test[start_ind:end_ind]
                         feed_dict = {
                                 train_flow_before:test_batch_flow_before,
                             dropout_keep_prob:1.0}
-
 
                         est=session.run(predict, feed_dict=feed_dict)
                         #est=np.array([xxx.sum() for xxx in test_batch_flow_before])
@@ -99,15 +98,15 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                             tp+=1
                         else:
                             fp+=1
-                    print "True Positive: ", tp
-                    print "False Positive: ", fp
+                    print("True Positive: ", tp)
+                    print("False Positive: ", fp)
                     # acc is the formula for precision
                     acc= float(tp)/float(tp+fp)
                     if float(tp)/float(tp+fp)>0.8:      
-                        print 'saving...'
+                        print('saving...')
                         save_path = saver.save(session, "./saved_models/tor_199_epoch%d_step%d_acc%.2f.ckpt"%(epoch,step,acc))
-                        print 'saved'
-            print 'Epoch',epoch
+                        print('saved')
+            print('Epoch',epoch)
             #save_path = saver.save(session, "/mnt/nfs/scratch1/milad/model_diff_large_1e4_epoch%d.ckpt"%(epoch))
 
             #t.join()
