@@ -12,7 +12,7 @@ from train_test import train_model,test_model
 ############## PARAMETERS FOR BOTH ##############
 gpu_device = 0
 training = True
-path_dataset = "/home/yagnihotri/projects/deepcorr/dataset"
+path_dataset = "/home/yagnihotri/datasets/deepcorr_original_dataset"
 
 ############## PARAMETERS TRAINING ##############
 load_only_flows_with_min_300 = True

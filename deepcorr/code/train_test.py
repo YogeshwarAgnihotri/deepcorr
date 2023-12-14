@@ -44,18 +44,17 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                     batch_flow_before=l2s[start_ind:end_ind,:]
                     batch_label= labels[start_ind:end_ind]
 
-
+                # Tensorflow speficic code. Keys are the placeholders and the values are the data
+                # This seems not the be validation data but training data therefore session run dosent return the validation loss but it returns the training loss
+                # train_flow_before = tf.placeholder(tf.float32, shape=[batch_size, 8,flow_size,1],name='flow_before_placeholder') used as placeholder
                 feed_dict = {train_flow_before: batch_flow_before,
                                 train_label:batch_label,
                             dropout_keep_prob:0.6}
                 # We perform one update step by evaluating the optimizer op (including it
                 # in the list of returned values for session.run()
 
+                # see feed_dict comment above. This seems to be the training loss not the validation loss
                 _, loss_val,summary = session.run([optimizer, loss, summary_op], feed_dict=feed_dict)
-
-
-
-
 
                 # average_loss += loss_val
                 writer.add_summary(summary, (epoch*num_steps) +step)
@@ -71,6 +70,7 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                 # Note that this is expensive (~20% slowdown if computed every 500 steps)
 
                 if ((epoch*num_steps) +step) % 100 == 0:
+                    # TODO why is this validation loss and not training loss?
                     print("Average loss on validation set at step ",  (epoch*num_steps) +step, ": ", loss_val)
                 if (((epoch*num_steps) +step)) % 3000 == 0 and epoch >1:
                     tp=0
@@ -89,7 +89,8 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                         est=session.run(predict, feed_dict=feed_dict)
                         #est=np.array([xxx.sum() for xxx in test_batch_flow_before])
                         Y_est[start_ind:end_ind]=est.reshape((batch_size))
-                    num_samples_test=len(l2s_test)/(negetive_samples+1)
+                    # the '//' rounds down to the nearest integer
+                    num_samples_test=len(l2s_test)//(negetive_samples+1)
 
                     for idx in range(num_samples_test-1):
                         best=np.argmax(Y_est[idx*(negetive_samples+1):(idx+1)*(negetive_samples+1)])
