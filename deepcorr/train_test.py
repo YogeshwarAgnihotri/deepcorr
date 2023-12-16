@@ -1,18 +1,20 @@
 import tensorflow as tf
-import data_processing
+import shared.data_processing as data_processing
 import numpy as np
 import tqdm
-
 import datetime
+import os
 
-
+from shared.utils import create_path
 
 
 # with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
 # with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
 #saver = tf.train.Saver()
 def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetive_samples, batch_size, train_flow_before, train_label, dropout_keep_prob, loss, optimizer, summary_op, init, saver, predict, graph, run_folder_path):
-    writer = tf.summary.FileWriter('./logs/tf_log/noise_classifier/allcir_300_'+str(datetime.datetime.now()), graph=graph)
+    print("Starting training...")
+    log_path = os.path.join(run_folder_path, "logs/tf_log/noise_classifier/allcir_300_", str(datetime.datetime.now()))
+    writer = tf.summary.FileWriter(log_path, graph=graph)
     
     with tf.Session(graph=graph) as session:
     # We must initialize all variables before we use them.
@@ -21,18 +23,21 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
         #TODO Check before running that everything is the same as the origial
 
         for epoch in range(num_epochs):
-            l2s, labels, l2s_test, labels_test = data_processing.generate_data_memmap(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size, run_folder_path=run_folder_path, negetive_samples=negetive_samples)
+            l2s, labels, l2s_test, labels_test = data_processing.generate_flow_pairs(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size, run_folder_path=run_folder_path, negetive_samples=negetive_samples)
+
+            # needs to be done since we have one positive and then 199 negative samples. needs to be shuffled   
+            # dont shuffle the l2s_test and labels_test since we want to keep the order of the test_index since need to know which groups belong together (1 group = 1 true flow pair and N_neg false flow pairs)         
             rr= list(range(len(l2s)))
             print("l2s size: ", len(l2s))
             np.random.shuffle(rr)
             l2s = l2s[rr]
             labels = labels[rr]
 
-
             average_loss = 0
             new_epoch=True
             num_steps= (len(l2s)//batch_size)-1
 
+            # TODO why is this called step and not mini batch
             for step in range(num_steps):
                 start_ind = step*batch_size
                 end_ind = ((step + 1) *batch_size)
@@ -72,7 +77,7 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                 if ((epoch*num_steps) +step) % 100 == 0:
                     # TODO why is this validation loss and not training loss?
                     print("Average loss on validation set at step ",  (epoch*num_steps) +step, ": ", loss_val)
-                if (((epoch*num_steps) +step)) % 3000 == 0 and epoch >1:
+                if (((epoch*num_steps) +step)) % 100 == 0 and epoch >1:
                     tp=0
                     fp=0
 
@@ -93,19 +98,26 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                     num_samples_test=len(l2s_test)//(negetive_samples+1)
 
                     for idx in range(num_samples_test-1):
+                        # see notion paper note in deepocorr note section for this formula
+                        # Tldr is that we take the index of the highest corr_proboability score (p_i,j) returned from the model for seach "group"
+                        # and one group is the one true flow pair and the N_neg false flow pairs
                         best=np.argmax(Y_est[idx*(negetive_samples+1):(idx+1)*(negetive_samples+1)])
 
+                        # Checking if the index of the flow_pair the model said it has the highest corr_probability score is the true flow pair. If they have the same index then it is the true flow pair
                         if labels_test[best+(idx*(negetive_samples+1))]==1:
                             tp+=1
                         else:
                             fp+=1
                     print("True Positive: ", tp)
                     print("False Positive: ", fp)
-                    # acc is the formula for precision
+                    # acc is the formula for precision. this seens not to be the accuracy but the precision. Furthermore this is also not the accuracy from the paper
                     acc= float(tp)/float(tp+fp)
                     if float(tp)/float(tp+fp)>0.8:      
                         print('saving...')
-                        save_path = saver.save(session, "./saved_models/tor_199_epoch%d_step%d_acc%.2f.ckpt"%(epoch,step,acc))
+                        model_saving_path = os.path.join(run_folder_path, "saved_models")
+                        create_path(model_saving_path)
+                        # TODO i think step here should be (epoch*num_steps) +step
+                        save_path = saver.save(session, os.path.join(model_saving_path, "tor_199_epoch%d_step%d_acc%.2f.ckpt"%(epoch,step,acc)))
                         print('saved')
             print('Epoch',epoch)
             #save_path = saver.save(session, "/mnt/nfs/scratch1/milad/model_diff_large_1e4_epoch%d.ckpt"%(epoch))
@@ -113,6 +125,7 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
             #t.join()
 
 def test_model(name, dataset, test_index, flow_size, batch_size, saver, predict, graph, train_flow_before, dropout_keep_prob):
+    print("Starting testing...")
     with tf.Session(graph=graph) as session:
         #name=raw_input('model name')
         print("inputted name: ", name)

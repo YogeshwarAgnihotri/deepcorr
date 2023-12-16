@@ -1,0 +1,17 @@
+
+Loading dataset from pickle files...
+Dataset length/Amount of true flow pairs:  7324
+
+Splitting dataset into training and testing sets...
+Dataset length/Amount of true flow pairs for TRAINING:  5126 true flow pairs
+Dataset length/Amount of true flow pairs for TESTING:  2198 true flow pairs
+
+Generating all flow pairs (including 10 negative flow pairs for each flow pair in dataset)...
+TRAINING set size (true and false flow pairs total):  56386
+TRAINING set size of true flow pairs:  5126
+TRAINING set size of false flow pairs:  51260
+TESTING set size (true and false flow pairs total):  24178
+TESTING set size of true flow pairs:  2198
+TESTING set size of false flow pairs:  21980
+
+Training the model...

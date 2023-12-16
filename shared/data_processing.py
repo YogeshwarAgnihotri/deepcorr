@@ -3,17 +3,17 @@ import tqdm
 import os
 import pickle
 
-from utils import check_create_path
+from shared.utils import create_path
 
-def generate_data_memmap(dataset,train_index,test_index,flow_size, run_folder_path, negetive_samples=199):
-
+def generate_flow_pairs(dataset,train_index,test_index,flow_size, run_folder_path, negetive_samples=199):
+    print(f"\nGenerating all flow pairs (including {negetive_samples} negative flow pairs for each flow pair in dataset)...")
     all_samples=len(train_index)
 
     # create temp folder for memmap files
     path_to_memmap_files = os.path.join(run_folder_path, "temp")
 
     # it shouldnt exits since we create a new folder for each run. so create a new folder called temp in the run_folder_path
-    check_create_path(path_to_memmap_files)
+    create_path(path_to_memmap_files)
 
     # creating paths for memmap files
     labels_path = os.path.join(path_to_memmap_files, ".labels")
@@ -29,7 +29,7 @@ def generate_data_memmap(dataset,train_index,test_index,flow_size, run_folder_pa
 
     index=0
     random_ordering=[]+train_index
-    for i in tqdm.tqdm(train_index):
+    for i in tqdm.tqdm(train_index, desc="Training data"):
         #[]#list(lsh.find_k_nearest_neighbors((Y_train[i]/ np.linalg.norm(Y_train[i])).astype(np.float64),(50)))
 
         #Saving True Pair
@@ -95,7 +95,7 @@ def generate_data_memmap(dataset,train_index,test_index,flow_size, run_folder_pa
     index=0
     random_test=[]+test_index
 
-    for i in tqdm.tqdm(test_index):
+    for i in tqdm.tqdm(test_index, desc="Testing data"):
         #list(lsh.find_k_nearest_neighbors((Y_test[i]/ np.linalg.norm(Y_test[i])).astype(np.float64),(50)))
 
         if index % (negetive_samples+1) !=0:
@@ -140,7 +140,15 @@ def generate_data_memmap(dataset,train_index,test_index,flow_size, run_folder_pa
         #l2s_test[index,1,:,1]=dataset[i]['there'][1]['<-'][:flow_size]
         #l2s_test[index,2,:,1]=dataset[i]['there'][1]['->'][:flow_size]
         #l2s_test[index,3,:,1]=dataset[i]['here'][1]['<-'][:flow_size]
-        labels_test[index]=1
+        labels_test[index]=1 
 
         index+=1
+
+    print("TRAINING set size (true and false flow pairs total): ", len(l2s))
+    print("TRAINING set size of true flow pairs: ", len(train_index))
+    print("TRAINING set size of false flow pairs: ", len(l2s)-len(train_index))
+    print("TESTING set size (true and false flow pairs total): ", len(l2s_test))
+    print("TESTING set size of true flow pairs: ", len(test_index))
+    print("TESTING set size of false flow pairs: ", len(l2s_test)-len(test_index))
+
     return l2s, labels,l2s_test,labels_test
