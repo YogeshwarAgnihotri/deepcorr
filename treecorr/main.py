@@ -164,6 +164,29 @@ def dt_train(training_data,
 
     return model
 
+def parse_max_features(value):
+    # Attempt to parse as an integer
+    try:
+        return int(value)
+    except ValueError:
+        pass
+
+    # Attempt to parse as a float
+    try:
+        float_value = float(value)
+        if 0.0 < float_value <= 1.0:
+            return float_value
+    except ValueError:
+        pass
+
+    # Check if it's a valid string option
+    if value in ['sqrt', 'log2', 'auto']:
+        return value
+
+    # If none of the above, raise an error
+    raise argparse.ArgumentTypeError(f"Invalid value for --max_features: {value}")
+
+
 #################### Parameters ####################
 # Set up argument parser
 parser = argparse.ArgumentParser(description='Train a Decision Tree Classifier on DeepCorr dataset.')
@@ -182,7 +205,7 @@ parser.add_argument('--max_depth', type=int, default=None, help='The maximum dep
 parser.add_argument('--min_samples_split', type=int, default=2, help='The minimum number of samples required to split an internal node')
 parser.add_argument('--min_samples_leaf', type=int, default=1, help='The minimum number of samples required to be at a leaf node')
 parser.add_argument('--min_weight_fraction_leaf', type=float, default=0.0, help='The minimum weighted fraction of the sum total of weights (of all the input samples) required to be at a leaf node. Samples have equal weight when sample_weight is not provided.')
-parser.add_argument('--max_features', type=str, default=None, help='The number of features to consider when looking for the best split')
+parser.add_argument('--max_features', type=parse_max_features, default=None, help='The number of features to consider when looking for the best split. Accepts an integer, a float in (0.0, 1.0], or one of {"sqrt", "log2", "auto"}.')
 parser.add_argument('--random_state', type=int, default=None, help='Controls the randomness of the estimator. The features are always randomly permuted at each split, even if splitter is set to “best”. When max_features < n_features, the algorithm will select max_features at random at each split before finding the best split among them. But the best found split may vary across different runs, even if max_features=n_features. That is the case, if the improvement of the criterion is identical for several splits and one split has to be selected at random. To obtain a deterministic behaviour during fitting, random_state has to be fixed to an integer.')
 parser.add_argument('--max_leaf_nodes', type=int, default=None, help='Grow a tree with max_leaf_nodes in best-first fashion. Best nodes are defined as relative reduction in impurity. If None then unlimited number of leaf nodes.')
 parser.add_argument('--min_impurity_decrease', type=float, default=0.0, help='A node will be split if this split induces a decrease of the impurity greater than or equal to this value.')
