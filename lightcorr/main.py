@@ -15,6 +15,21 @@ def load_config(config_path):
         config = yaml.safe_load(file)
     return config
 
+def initialize_model(config, model_type, search_type):
+    if model_type == 'decision_tree':
+        if search_type == 'none':
+            # Use predefined parameters for single model training
+            model_params = config['single_model_training']['decision_tree']
+            return DecisionTreeClassifier(**model_params)
+        elif search_type == 'grid_search':
+            # Initialize without parameters for hyperparameter search
+            return DecisionTreeClassifier()
+        elif search_type == 'random_search':
+            # Initialize without parameters for hyperparameter search
+            return DecisionTreeClassifier()
+    else:
+        raise ValueError(f"Unsupported model type: {model_type}")
+
 def main():
     # Parse only the config file path
     parser = argparse.ArgumentParser(description='Train a Classifier on the dataset.')
@@ -46,36 +61,30 @@ def main():
 
     # Model initialization
     model_type = config['model_type']
-    if model_type == 'decision_tree':
-        model = DecisionTreeClassifier(**config['decision_tree'])
-    elif model_type == 'random_forest':
-        model = RandomForestClassifier(**config['random_forest'])
+    hyperparameter_search_type = config['hyperparameter_search_settings']['hyperparameter_search_type']
+    model = initialize_model(config, model_type, hyperparameter_search_type)
+
+    # Dynamically select the hyperparameter grid
+    if hyperparameter_search_type != 'none':
+        selected_hyperparameter_grid = config['hyperparameter_search_settings']['selected_hyperparameter_grid']
+        parameter_grid = config['hyperparameter_grid'].get(selected_hyperparameter_grid, {})
+
+    # Hyperparameter search or training
+    if hyperparameter_search_type == 'grid_search':
+        grid_search_config = config['hyperparameter_search_settings']['grid_search']
+        best_model, best_hyperparameters = train_classifier_gridSearch(
+            model, flow_pairs_train, labels_train, parameter_grid, **grid_search_config
+        )
+    elif hyperparameter_search_type == 'random_search':
+        random_search_config = config['hyperparameter_search_settings']['random_search']
+        best_model, best_hyperparameters = train_classifier_randomSearch(
+            model, flow_pairs_train, labels_train, parameter_grid, **random_search_config
+        )
+    elif hyperparameter_search_type == 'none':
+        best_model = train_model(model, flow_pairs_train, labels_train)
     else:
-        raise ValueError(f"Unsupported model type: {model_type}")
+        raise ValueError(f"Unsupported hyperparameter search type: {hyperparameter_search_type}")
 
-    # Hyperparameter search settings
-    hyperparameter_search_config = config['hyperparameter_search']
-    search_type = hyperparameter_search_config['type']
-
-    if search_type != 'none':
-        parameter_grid_path = hyperparameter_search_config['param_grid_path']
-        if parameter_grid_path:
-            parameter_grid = load_yaml(parameter_grid_path)
-        else:
-            raise ValueError("Parameter grid path must be specified for hyperparameter search.")
-
-        if search_type == 'grid_search':
-            model, _ = train_classifier_gridSearch(
-                model, flow_pairs_train, labels_train, parameter_grid, hyperparameter_search_config['cross_validation_folds'], 
-                hyperparameter_search_config['search_verbosity']
-            )
-        elif search_type == 'random_search':
-            model, _ = train_classifier_randomSearch(
-                model, flow_pairs_train, labels_train, parameter_grid, hyperparameter_search_config['random_search']['n_iter'], 
-                hyperparameter_search_config['cross_validation_folds'], verbosity=hyperparameter_search_config['search_verbosity']
-            )
-    else:
-        model = train_model(model, flow_pairs_train, labels_train)
 
     # Make predictions and evaluate the model
     predictions = model.predict(flow_pairs_test)

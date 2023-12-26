@@ -4,44 +4,65 @@ dataset_path: "/home/yagnihotri/datasets/deepcorr_original_dataset"  # Path to t
 run_folder_path: "/home/yagnihotri/projects/corr/treecorr"  # Path to the folder where the run folder will be created
 train_ratio: 0.8  # Training set ratio
 flow_size: 300  # Flow size
-negative_samples: 199  # Number of negative samples
+negative_samples: 1  # Number of negative samples
 load_all_data: false  # If true, load all data; otherwise, only load flows with minimum specified packets
 
 # Hyperparameter Search Settings
-hyperparameter_search:
-  type: "none"  # Type of hyperparameter search ("none", "grid", "random")
-  search_verbosity: 2  # Verbosity level for hyperparameter search
-  cross_validation_folds: 5  # Number of folds for cross-validation
+hyperparameter_search_settings:
+  hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "random_search")
+  selected_hyperparameter_grid: "decision_tree_simple"  # Name of the hyperparameter grid to use (see below)
 
-  # Parameter grid file path for Grid and Random Search
-  param_grid_path: null  # Path to JSON/YAML file containing the grid of hyperparameters to explore
-
-  # Parameters for Grid Search
   grid_search:
-    # Add grid search specific parameters here if needed
+    verbose: 2  # Verbosity level for hyperparameter search
+    cv: 5  # Number of folds for cross-validation
+    # Default parameters for GridSearchCV
+    scoring: 'accuracy'  # Default scoring method
+    n_jobs: -1  # Default number of jobs to run in parallel
 
-  # Parameters for Random Search
   random_search:
-    n_iter: 10  # Number of parameter settings sampled for random search
+    verbose: 2  # Verbosity level for hyperparameter search
+    cv: 5  # Number of folds for cross-validation
+    n_iter: 3  # Number of parameter settings sampled for random search
+    # Default parameters for RandomizedSearchCV
+    scoring: 'accuracy'  # Default scoring method
+    n_jobs: -1  # Default number of jobs to run in parallel. -1 means all processors
+    refit: True  # Default setting to refit an estimator
+    pre_dispatch: '2*n_jobs'  # Default pre-dispatch configuration
+    random_state: None  # Default random state
+    error_score: 'raise'  # Default error handling
+    return_train_score: False  # Default setting for returning train scores
 
-# Decision Tree Parameters
-decision_tree:
-  criterion: "gini"  # Function to measure the quality of a split ("gini", "log_loss", "entropy")
-  splitter: "best"  # Strategy to choose the split at each node ("best", "random")
-  max_depth: null  # Maximum depth of the tree (null for unlimited)
-  min_samples_split: 2  # Minimum number of samples required to split an internal node
-  min_samples_leaf: 1  # Minimum number of samples required to be at a leaf node
-  min_weight_fraction_leaf: 0.0  # Minimum weighted fraction of the sum total of weights required at a leaf node
-  max_features: null  # Number of features to consider for the best split (integer, float, "sqrt", "log2", "auto")
-  random_state: null  # Controls the randomness of the estimator
-  max_leaf_nodes: null  # Maximum number of leaf nodes (null for unlimited)
-  min_impurity_decrease: 0.0  # A node will be split if the decrease in impurity is greater than this value
-  class_weight: null  # Weights associated with classes in the form {class_label: weight}
-  ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning
+# Hyperparameter Grid (For use with grid or random search)
+hyperparameter_grid:
+  decision_tree_extensive:
+    criterion: ["gini", "entropy"] 
+    splitter: ["best", "random"] 
+    max_depth: [null, 10, 20, 30, 40, 50, 60]
+    min_samples_split: [2, 4, 6, 8, 10] 
+    min_samples_leaf: [1, 2, 3, 4, 5]  
+    max_features: [null, "sqrt", "log2", 0.5, 0.75, 1.0]  
+    class_weight: [null, "balanced", {0: 1, 1: 2}, {0: 1, 1: 3}]  
+    min_impurity_decrease: [0.0, 0.01, 0.02, 0.05] 
+    ccp_alpha: [0.0, 0.01, 0.02, 0.05] 
 
-# Random Forest Parameters (placeholders, fill as needed) TO BE COMPLETED
-random_forest:
-  n_estimators: 100  # Number of trees in the forest
-  max_depth: null  # Maximum depth of each tree
-  max_features: "auto"  # Number of features to consider for the best split
-  # ... additional parameters as needed ...
+  decision_tree_simple:
+    criterion: ["gini", "entropy"] 
+    max_depth: [null, 10, 20, 30] 
+    min_samples_split: [2, 5, 10]  
+    min_samples_leaf: [1, 2, 4]  
+
+# Single Model Training Settings (For training without hyperparameter search)
+single_model_training:
+  decision_tree:
+    criterion: "gini"  # Function to measure the quality of a split
+    splitter: "best"  # Strategy to choose the split at each node
+    max_depth: null  # Maximum depth of the tree
+    min_samples_split: 2  # Minimum number of samples required to split an internal node
+    min_samples_leaf: 1  # Minimum number of samples required to be at a leaf node
+    min_weight_fraction_leaf: 0.0  # Minimum weighted fraction of the sum total of weights required at a leaf node
+    max_features: null  # Number of features to consider for the best split
+    random_state: null  # Controls the randomness of the estimator
+    max_leaf_nodes: null  # Maximum number of leaf nodes
+    min_impurity_decrease: 0.0  # A node will be split if the decrease in impurity is greater than this value
+    class_weight: null  # Weights associated with classes
+    ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning
