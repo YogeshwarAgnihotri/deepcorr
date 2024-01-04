@@ -5,21 +5,18 @@ import pickle
 
 from shared.utils import create_path
 
-def generate_flow_pairs(dataset,train_index,test_index,flow_size, run_folder_path, negetive_samples=199):
+def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memmap_saving_path, negetive_samples):
     print(f"\nGenerating all flow pairs (including {negetive_samples} negative flow pairs for each flow pair in dataset)...")
     all_samples=len(train_index)
 
-    # create temp folder for memmap files
-    path_to_memmap_files = os.path.join(run_folder_path, "temp")
-
-    # it shouldnt exits since we create a new folder for each run. so create a new folder called temp in the run_folder_path
-    create_path(path_to_memmap_files)
+    # if it dosent exit create the path
+    create_path(memmap_saving_path)
 
     # creating paths for memmap files
-    labels_path = os.path.join(path_to_memmap_files, ".labels")
-    l2s_path = os.path.join(path_to_memmap_files, ".l2s")
-    labels_test_path = os.path.join(path_to_memmap_files, ".labels_test")
-    l2s_test_path = os.path.join(path_to_memmap_files, ".l2s_test")
+    labels_path = os.path.join(memmap_saving_path, "training_labels")
+    l2s_path = os.path.join(memmap_saving_path, "training_flow_pairs")
+    labels_test_path = os.path.join(memmap_saving_path, "test_labels")
+    l2s_test_path = os.path.join(memmap_saving_path, "test_flow_pairs")
     
     # Memmap creation
     labels = np.memmap(labels_path, dtype=np.float32, mode='w+', shape=(all_samples*(negetive_samples+1),1))
