@@ -21,9 +21,10 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
         session.run(init)
 
         #TODO Check before running that everything is the same as the origial
+        temp_path = os.join(run_folder_path, "temp")
 
         for epoch in range(num_epochs):
-            l2s, labels, l2s_test, labels_test = data_processing.generate_flow_pairs(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size, run_folder_path=run_folder_path, negetive_samples=negetive_samples)
+            l2s, labels, l2s_test, labels_test = data_processing.generate_flow_pairs_to_memmap(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size, memmap_saving_path=temp_path, negetive_samples=negetive_samples)
 
             # needs to be done since we have one positive and then 199 negative samples. needs to be shuffled   
             # dont shuffle the l2s_test and labels_test since we want to keep the order of the test_index since need to know which groups belong together (1 group = 1 true flow pair and N_neg false flow pairs)         
