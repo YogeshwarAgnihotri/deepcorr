@@ -2,9 +2,11 @@ import pickle
 import tqdm
 from shared.utils import check_path_throw_error
 import os
+import numpy as np
+import json 
 
 def load_dataset_deepcorr(path_dataset, load_all_data=False):
-    print("\nLoading dataset from pickle files...")
+    print("\nLoading dataset from base pickle files...")
     check_path_throw_error(path_dataset)
 
     runs = {
@@ -55,3 +57,24 @@ def load_test_index_deepcorr():
     with open('test_index300.pickle', 'rb') as file:
         test_index = pickle.load(file)[:1000]
     return test_index
+
+def load_pregenerated_memmap_dataset(path):
+    print("\nLoading pregenerated memmap dataset...")
+    check_path_throw_error(path)
+
+    # Load shapes from the JSON file
+    shapes_file_path = os.path.join(path, 'memmap_shapes.json')
+    with open(shapes_file_path, 'r') as f:
+        shapes = json.load(f)
+
+    labels_path = os.path.join(path, "training_labels")
+    l2s_path = os.path.join(path, "training_flow_pairs")
+    labels_test_path = os.path.join(path, "test_labels")
+    l2s_test_path = os.path.join(path, "test_flow_pairs")
+
+    labels = np.memmap(labels_path, dtype=np.float32, mode='r', shape=tuple(shapes["labels_train_shape"]))
+    l2s = np.memmap(l2s_path, dtype=np.float32, mode='r', shape=tuple(shapes["flow_pairs_train_shape"]))
+    labels_test = np.memmap(labels_test_path, dtype=np.float32, mode='r', shape=tuple(shapes["labels_test_shape"]))
+    l2s_test = np.memmap(l2s_test_path, dtype=np.float32, mode='r', shape=tuple(shapes["flow_pairs_test_shape"]))
+
+    return l2s, labels, l2s_test, labels_test

@@ -1,16 +1,31 @@
-# General Dataset and Run Settings
-model_type: "decision_tree"  # "decision_tree" or "random_forest"
-dataset_path: "/home/yagnihotri/datasets/deepcorr_original_dataset"  # Path to the DeepCorr dataset
-run_folder_path: "/home/yagnihotri/projects/corr/treecorr"  # Path to the folder where the run folder will be created
-train_ratio: 0.8  # Training set ratio
-flow_size: 300  # Flow size
-negative_samples: 1  # Number of negative samples
-load_all_data: false  # If true, load all data; otherwise, only load flows with minimum specified packets
+#####################Dataset loading, splitting and generating settings#####################
+load_pregenerated_dataset: True  # If true, load the dataset; otherwise, generate the dataset
+pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr_custom_pregenerated"  # Path to the preprocessed dataset
 
-# Hyperparameter Search Settings
+# Dataset generation settings
+base_dataset_path: "/home/yagnihotri/datasets/deepcorr_original_dataset"  # Path to the DeepCorr dataset
+train_ratio: 0.8  # Training set ratio
+flow_size: 300  # Flow sizes
+negative_samples: 1  # Number of negative samples
+load_all_data: False  # If true, load all data; otherwise, only load flows with minimum specified packets
+
+
+######################################Run Settings###########################################
+model_type: "decision_tree"  # "decision_tree" or "random_forest"
+run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"  # Path to the folder where the run folder will be created
+
+######################################Evaluation Settings######################################
+evaluation_settings:
+  cross_validation:
+    cv: 5  # Number of folds for cross-validation
+    n_jobs: -1  # Number of jobs to run in parallel. -1 means using all processors
+    verbose: 2  # Verbosity level for cross-validation
+  evaluate_on_test_set: false  # If true, evaluate the model on the test set
+
+######################################Hyperparameter Settings#################################
 hyperparameter_search_settings:
   hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "random_search")
-  selected_hyperparameter_grid: "decision_tree_simple"  # Name of the hyperparameter grid to use (see below)
+  selected_hyperparameter_grid: "decision_tree_extensive"  # Name of the hyperparameter grid to use (see below)
 
   grid_search:
     verbose: 2  # Verbosity level for hyperparameter search
@@ -22,13 +37,13 @@ hyperparameter_search_settings:
   random_search:
     verbose: 2  # Verbosity level for hyperparameter search
     cv: 5  # Number of folds for cross-validation
-    n_iter: 3  # Number of parameter settings sampled for random search
+    n_iter: 1000000  # Number of parameter settings sampled for random search
     # Default parameters for RandomizedSearchCV
     scoring: 'accuracy'  # Default scoring method
     n_jobs: -1  # Default number of jobs to run in parallel. -1 means all processors
     refit: True  # Default setting to refit an estimator
     pre_dispatch: '2*n_jobs'  # Default pre-dispatch configuration
-    random_state: None  # Default random state
+    random_state: null  # Default random state
     error_score: 'raise'  # Default error handling
     return_train_score: False  # Default setting for returning train scores
 
@@ -51,6 +66,7 @@ hyperparameter_grid:
     min_samples_split: [2, 5, 10]  
     min_samples_leaf: [1, 2, 4]  
 
+######################################Single Model Training Settings########################
 # Single Model Training Settings (For training without hyperparameter search)
 single_model_training:
   decision_tree:

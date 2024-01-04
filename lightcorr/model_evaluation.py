@@ -1,7 +1,20 @@
 # evaluation.py
 # Functions for evaluating the trained model and printing metrics.
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
+from sklearn.model_selection import cross_val_predict
 
+def evaluate_cross_val(model, training_data, training_labels, **kwargs):
+    print("\nEvaluating the model on the training set with cross validation...")
+    # Do Cross Validation on the best model to calcuate metrics
+    cross_val_predictions = cross_val_predict(model, training_data, training_labels, **kwargs)
+    evaluate_model_print_metrics(true_labels=training_labels, predicted_labels=cross_val_predictions)
+
+def evaluate_test_set(model, training_data, labels_test):
+    print("\nEvaluating the model on the test set...")
+    # # Make predictions and evaluate the model
+    predictions = model.predict(training_data)
+    evaluate_model_print_metrics(true_labels=labels_test, predicted_labels=predictions)
+    
 def evaluate_model_print_metrics(true_labels, predicted_labels):
     # Evaluate the model
     accuracy = accuracy_score(true_labels, predicted_labels)
