@@ -1,8 +1,10 @@
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import argparse
+import shutil
+
+
 import yaml
 
 from sklearn.tree import DecisionTreeClassifier
@@ -16,6 +18,12 @@ from shared.data_processing import generate_flow_pairs_to_memmap
 from shared.train_test_split import calc_train_test_indexes
 from shared.data_loader import load_dataset_deepcorr, load_pregenerated_memmap_dataset
 
+def config_checks(config):
+    if config['hyperparameter_search_type'] != 'none' and config['single_model_training_config'] != 'none':
+        raise ValueError(f"single_model_training_config must be None when hyperparameter_search_type is not none. Cant search for hyperparamers and traning a single model at the same time.")
+    if config['hyperparameter_search_type'] == 'none' and config['single_model_training_config'] == 'none':
+        raise ValueError(f"single_model_training_config and hyperparameter_search_type are both none. Cant do nothing.")
+
 def load_config(config_path):
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
@@ -24,8 +32,9 @@ def load_config(config_path):
 def initialize_model(config, model_type, search_type):
     if model_type == 'decision_tree':
         if search_type == 'none':
+            single_model_training_config = config['single_model_training_config']
             # Use predefined parameters for single model training
-            model_params = config['single_model_training']['decision_tree']
+            model_params = config['single_model_training']['decision_tree'][single_model_training_config]
             return DecisionTreeClassifier(**model_params)
         elif search_type == 'grid_search':
             # Initialize without parameters for hyperparameter search
@@ -44,6 +53,7 @@ def main():
 
     # Load configuration
     config = load_config(args.config_path)
+    config_checks(config)
 
     # Prepare the run folder and logger
     run_folder_path = config['run_folder_path']
@@ -85,12 +95,12 @@ def main():
 
     # Model initialization
     model_type = config['model_type']
-    hyperparameter_search_type = config['hyperparameter_search_settings']['hyperparameter_search_type']
+    hyperparameter_search_type = config['hyperparameter_search_type']
     model = initialize_model(config, model_type, hyperparameter_search_type)
 
     # Dynamically select the hyperparameter grid
     if hyperparameter_search_type != 'none':
-        selected_hyperparameter_grid = config['hyperparameter_search_settings']['selected_hyperparameter_grid']
+        selected_hyperparameter_grid = config['selected_hyperparameter_grid']
         parameter_grid = config['hyperparameter_grid'].get(selected_hyperparameter_grid, {})
 
     # Hyperparameter search or training
@@ -118,8 +128,10 @@ def main():
         # Evaluate the model on the test set
         evaluate_test_set(best_model, flow_pairs_test, labels_test)
 
-    # Print all configurations used for this run
-    print(f"Configuration used: {config}")
+    # Copy the configuration file to the run folder and rename it to "used_config.yaml"
+    config_file_destination = os.path.join(run_folder_path, "used_config.yaml")
+    shutil.copy(args.config_path, config_file_destination)
+
 
 if __name__ == "__main__":
     main()

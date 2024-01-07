@@ -15,8 +15,8 @@ load_all_data: False  # If true, load all data; otherwise, only load flows with 
 model_type: "decision_tree"  # "decision_tree"
 run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"  # Path to the folder where the run folder will be created
 
-hyperparameter_search_type: "grid_search"  # Type of hyperparameter search ("none", "grid_search", "random_search")
-selected_hyperparameter_grid: "decision_tree_simple"  # Name of the hyperparameter grid to use (see below)
+hyperparameter_search_type: "random_search"  # Type of hyperparameter search ("none", "grid_search", "random_search")
+selected_hyperparameter_grid: "decision_tree_extensive"  # Name of the hyperparameter grid to use (see below)
 # Selects which confinguration to use for single model training see below for details
 single_model_training_config: "none" # select one from the single training config below. 
 
@@ -35,15 +35,15 @@ hyperparameter_search_settings:
     cv: 5  # Number of folds for cross-validation
     # Default parameters for GridSearchCV
     scoring: 'accuracy'  # Default scoring method
-    n_jobs: 6  # Default number of jobs to run in parallel
+    n_jobs: 8  # Default number of jobs to run in parallel
 
   random_search:
-    verbose: 2  # Verbosity level for hyperparameter search
+    verbose: 100  # Verbosity level for hyperparameter search
     cv: 5  # Number of folds for cross-validation
-    n_iter: 1000000  # Number of parameter settings sampled for random search
+    n_iter: 200  # Number of parameter settings sampled for random search
     # Default parameters for RandomizedSearchCV
     scoring: 'accuracy'  # Default scoring method
-    n_jobs: -1  # Default number of jobs to run in parallel. -1 means all processors
+    n_jobs: 8  # Default number of jobs to run in parallel. -1 means all processors
     refit: True  # Default setting to refit an estimator
     pre_dispatch: '2*n_jobs'  # Default pre-dispatch configuration
     random_state: null  # Default random state
