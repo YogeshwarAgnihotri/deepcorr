@@ -2,6 +2,7 @@ import os
 import logging
 import yaml
 import datetime
+import pandas 
 
 def create_path(path):
     if not os.path.exists(path):
@@ -74,3 +75,23 @@ def create_run_folder(base_path):
     run_folder_path = os.path.join(base_path, "runs", run_name)
     os.makedirs(run_folder_path, exist_ok=True)
     return run_folder_path
+
+def export_dataframe_to_csv(df, file_name, folder_path, create_folder_if_not_exist=True):
+    """
+    Exports a given DataFrame to a CSV file in the specified folder.
+
+    :param df: Pandas DataFrame to be exported.
+    :param file_name: Name of the CSV file (including .csv extension).
+    :param folder_path: Path to the folder where the CSV file will be saved.
+    :param create_folder: If True, creates the folder if it doesn't exist. Default is True.
+    """
+    if create_folder_if_not_exist:
+        os.makedirs(folder_path, exist_ok=True)  # Create the folder if it doesn't exist
+
+    # Define the full file path
+    file_path = os.path.join(folder_path, file_name)
+
+    # Export the DataFrame to a CSV file
+    df.to_csv(file_path, index=False)
+
+    print(f"Data exported to {file_path}")

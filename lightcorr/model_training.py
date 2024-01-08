@@ -29,10 +29,10 @@ def run_search_training(search, training_data, labels, search_type):
     best_model = search.best_estimator_
     best_hyperparameters = search.best_params_
     best_score = search.best_score_
+    cv_results = search.cv_results_
 
     print(f"\nTraining completed in {format_time(training_time)}")
     print(f"\nBest parameters: {best_hyperparameters}")
     print(f"\nMean cross-validated score of the best_estimator: {best_score}")
 
-    return best_model, best_hyperparameters
-
+    return best_model, best_hyperparameters, cv_results
