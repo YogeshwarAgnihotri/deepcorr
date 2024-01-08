@@ -14,7 +14,7 @@ from model_training import train_model, train_classifier_gridSearch, train_class
 from model_evaluation import evaluate_cross_val, evaluate_test_set
 from config_utlis import config_checks, load_config, initialize_model
 
-from shared.utils import StreamToLogger, setup_logger, create_run_folder, export_dataframe_to_csv
+from shared.utils import StreamToLogger, setup_logger, create_run_folder, export_dataframe_to_csv, save_array_to_file
 from shared.data_processing import generate_flow_pairs_to_memmap
 from shared.train_test_split import calc_train_test_indexes
 from shared.data_loader import load_dataset_deepcorr, load_pregenerated_memmap_dataset
@@ -62,11 +62,17 @@ def main():
             flow_size=flow_size, 
             memmap_saving_path=memmap_dataset_path, 
             negetive_samples=negative_samples)
+        
+    # for debugging TODO remove later
+    #export_dataframe_to_csv(pandas.DataFrame(flow_pairs_train), 'flow_pairs_train_before_flattening.csv', run_folder_path)
 
     # some flattinening and stuff to make it work with the decision tree
     flow_pairs_train, labels_train, flow_pairs_test, labels_test = prepare_data_for_training(
         flow_pairs_train, labels_train, flow_pairs_test, labels_test
     ) 
+
+    # for debugging TODO remove later
+    export_dataframe_to_csv(pandas.DataFrame(flow_pairs_train), 'flow_pairs_train.csv', run_folder_path)
 
     # Model initialization
     model_type = config['model_type']
