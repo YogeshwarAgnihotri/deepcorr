@@ -12,13 +12,13 @@ load_all_data: False  # If true, load all data; otherwise, only load flows with 
 
 
 ######################################Run Settings###########################################
-model_type: ""  # "decision_tree" , "random_forest"
+model_type: "decision_tree"  # "decision_tree" , "random_forest"
 run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"  # Path to the folder where the run folder will be created
 
 hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "random_search")
 selected_hyperparameter_grid: "none"  # Name of the hyperparameter grid to use (see below)
 # Selects which confinguration to use for single model training see below for details
-single_model_training_config: "none" # select one from the single training config below. 
+single_model_training_config: "default" # select one from the single training config below. 
 
 ######################################Evaluation Settings######################################
 evaluation_settings:
@@ -84,17 +84,6 @@ hyperparameter_grid:
       bootstrap: [True, False]
       class_weight: [null, "balanced"]
       n_jobs: [-1]
-    second:
-      n_estimators: [300, 400, 500]
-      max_depth: [10, 15, 20, 25, null]
-      min_samples_split: [3, 4, 5]
-      min_samples_leaf: [2, 3, 4]
-      max_features: ["sqrt", "log2"]
-      bootstrap: [False]
-      class_weight: ["balanced"]
-      n_jobs: [-1]
-
-
 
 ######################################Single Model Training Settings########################
 # Single Model Training Settings (For training without hyperparameter search)

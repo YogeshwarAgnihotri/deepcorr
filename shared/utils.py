@@ -3,6 +3,7 @@ import logging
 import yaml
 import datetime
 import pandas 
+import numpy as np
 
 def create_path(path):
     if not os.path.exists(path):
@@ -95,3 +96,19 @@ def export_dataframe_to_csv(df, file_name, folder_path, create_folder_if_not_exi
     df.to_csv(file_path, index=False)
 
     print(f"Data exported to {file_path}")
+
+def save_array_to_file(array, file_name):
+    """
+    Save a NumPy array to a text file.
+
+    :param array: NumPy array to be saved.
+    :param file_name: Name of the file where the array will be saved.
+    """
+    with open(file_name, 'w') as file:
+        # Write the shape of the array for reference
+        file.write(f"Array Shape: {array.shape}\n\n")
+
+        # Use numpy array2string to handle the formatting
+        # Set the threshold to np.inf to ensure the whole array is printed
+        array_str = np.array2string(array, threshold=np.inf)
+        file.write(array_str)
