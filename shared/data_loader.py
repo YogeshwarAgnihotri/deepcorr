@@ -77,4 +77,20 @@ def load_pregenerated_memmap_dataset(path):
     labels_test = np.memmap(labels_test_path, dtype=np.float32, mode='r', shape=tuple(shapes["labels_test_shape"]))
     l2s_test = np.memmap(l2s_test_path, dtype=np.float32, mode='r', shape=tuple(shapes["flow_pairs_test_shape"]))
 
+    # Count true and false labels
+    true_training_pairs = np.sum(labels)
+    false_training_pairs = labels.shape[0] - true_training_pairs
+    true_testing_pairs = np.sum(labels_test)
+    false_testing_pairs = labels_test.shape[0] - true_testing_pairs
+
+    # Print the dataset sizes
+    print("Pre-generated dataset loaded successfully! Dataset sizes:")
+    print(f"TRAINING set size (true and false flow pairs total): {labels.shape[0]}")
+    print(f"TRAINING set size of true flow pairs: {int(true_training_pairs)}")
+    print(f"TRAINING set size of false flow pairs: {int(false_training_pairs)}")
+    print(f"TESTING set size (true and false flow pairs total): {labels_test.shape[0]}")
+    print(f"TESTING set size of true flow pairs: {int(true_testing_pairs)}")
+    print(f"TESTING set size of false flow pairs: {int(false_testing_pairs)}")
+
+
     return l2s, labels, l2s_test, labels_test
