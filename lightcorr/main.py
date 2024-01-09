@@ -1,8 +1,8 @@
 import sys
 import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import pandas
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import argparse
 import shutil
 
@@ -11,7 +11,7 @@ import yaml
 
 from data_handling import prepare_data_for_training
 from model_training import train_model, train_classifier_gridSearch, train_classifier_randomSearch
-from model_evaluation import evaluate_cross_val, evaluate_test_set
+from model_evaluation import cross_validate, evaluate_test_set
 from config_utlis import config_checks, load_config, initialize_model
 
 from shared.utils import StreamToLogger, setup_logger, create_run_folder, export_dataframe_to_csv, save_array_to_file
@@ -104,8 +104,9 @@ def main():
         raise ValueError(f"Unsupported hyperparameter search type: {hyperparameter_search_type}")
 
     # Evaluate the model on the training set with cross validation
-    evalutation_config = config['evaluation_settings']['cross_validation']
-    evaluate_cross_val(best_model, flow_pairs_train, labels_train, **evalutation_config)
+    validation_config = config['validation_settings']['cross_validation']
+    roc_plot_enabled = config['validation_settings']['roc_plot_enabled']
+    cross_validate(best_model, flow_pairs_train, labels_train, roc_plot_enabled, run_folder_path, **validation_config)
 
     if config['evaluation_settings']['evaluate_on_test_set']:
         # Evaluate the model on the test set

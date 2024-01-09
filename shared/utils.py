@@ -112,3 +112,8 @@ def save_array_to_file(array, file_name):
         # Set the threshold to np.inf to ensure the whole array is printed
         array_str = np.array2string(array, threshold=np.inf)
         file.write(array_str)
+
+def save_plot_to_path(fig, file_name, save_path):
+    create_path(os.path.dirname(save_path))
+    # Save the figure to the specified file
+    fig.savefig(os.path.join(save_path, file_name), bbox_inches='tight')
