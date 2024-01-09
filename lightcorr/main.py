@@ -19,7 +19,6 @@ from shared.data_processing import generate_flow_pairs_to_memmap
 from shared.train_test_split import calc_train_test_indexes
 from shared.data_loader import load_dataset_deepcorr, load_pregenerated_memmap_dataset
 
-
 def main():
     # Parse only the config file path
     parser = argparse.ArgumentParser(description='Train a Classifier on the dataset.')
@@ -30,12 +29,22 @@ def main():
     config = load_config(args.config_path)
     config_checks(config)
 
+    # Print the configuration (only idenityfing information)
+    print("Model type:", config['model_type'])
+    print("Hyperparameter search type:", config['hyperparameter_search_type'])
+    print("Hyperparameter grid:", config['selected_hyperparameter_grid'])
+    print("Single model training config:", config['single_model_training_config'])
+
     # Prepare the run folder and logger
     run_folder_path = config['run_folder_path']
     run_folder_path = create_run_folder(run_folder_path)
     output_file_path = os.path.join(run_folder_path, "training_log.txt")
     logger = setup_logger('TrainingLogger', output_file_path)
     sys.stdout = StreamToLogger(logger, sys.stdout)
+
+    # Copy the configuration file to the run folder and rename it to "used_config.yaml"
+    config_file_destination = os.path.join(run_folder_path, "used_config.yaml")
+    shutil.copy(args.config_path, config_file_destination)
 
     
     if config['load_pregenerated_dataset']:
@@ -111,10 +120,6 @@ def main():
     if config['evaluation_settings']['evaluate_on_test_set']:
         # Evaluate the model on the test set
         evaluate_test_set(best_model, flow_pairs_test, labels_test)
-
-    # Copy the configuration file to the run folder and rename it to "used_config.yaml"
-    config_file_destination = os.path.join(run_folder_path, "used_config.yaml")
-    shutil.copy(args.config_path, config_file_destination)
 
 
 if __name__ == "__main__":
