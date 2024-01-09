@@ -1,4 +1,5 @@
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 import time
 from shared.utils import format_time
 
@@ -12,11 +13,28 @@ def train_model(model, training_data, labels):
     return model
 
 def train_classifier_gridSearch(model, training_data, labels, param_grid, **kwargs):
-    grid_search = GridSearchCV(model, param_grid, **kwargs)
+    # Define multiple scoring metrics
+    scoring = {
+        'accuracy': make_scorer(accuracy_score),
+        'precision': make_scorer(precision_score),
+        'recall': make_scorer(recall_score),
+        'f1_score': make_scorer(f1_score),
+        'roc_auc_score': make_scorer(roc_auc_score)
+    }
+    
+    grid_search = GridSearchCV(model, scoring, param_grid, **kwargs)
     return run_search_training(grid_search, training_data, labels, 'grid')
 
 def train_classifier_randomSearch(model, training_data, labels, param_distributions, **kwargs):
-    random_search = RandomizedSearchCV(model, param_distributions, **kwargs)
+    scoring = {
+        'accuracy': make_scorer(accuracy_score),
+        'precision': make_scorer(precision_score),
+        'recall': make_scorer(recall_score),
+        'f1_score': make_scorer(f1_score),
+        'roc_auc_score': make_scorer(roc_auc_score)
+    }
+    
+    random_search = RandomizedSearchCV(model, scoring=scoring, param_distributions=param_distributions, **kwargs)
     return run_search_training(random_search, training_data, labels, 'random')
 
 
