@@ -2,6 +2,7 @@
 *.pickle
 DeepCorr.json
 *.pyc
+*.npy
 
 # ignore dataset folder and subfolders
 datasets/
@@ -10,3 +11,5 @@ saved_models/
 temp/
 runs/
 saved_runs/
+config/dt/
+config/rf/
