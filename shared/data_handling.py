@@ -5,7 +5,12 @@ import os
 import numpy as np
 import json 
 
-def load_dataset_deepcorr(path_dataset, load_all_data=False):
+"""
+This is a collection of functions for inital data handling. Everything what is
+not related to intial stuff should be in data_processing.py
+"""
+
+def load_dataset_deepcorr(path_dataset, load_all_data):  
     print("\nLoading dataset from base pickle files...")
     check_path_throw_error(path_dataset)
 
@@ -33,7 +38,7 @@ def load_dataset_deepcorr(path_dataset, load_all_data=False):
         else:
             paths_to_pickle_files_to_load.extend([
                 # TODO add the padding stuff from the other script (somewhere done already) and then use this. otherwise this doesent work currently
-                # It contains about another 12.000 flow pairs (half of the full dataset)
+                # It contains about another 11.260 flow pairs (half of the full dataset)
                 #os.path.join(path_dataset, f"{name}_tordata.pickle"),
                 os.path.join(path_dataset, f"{name}_tordata300.pickle"),
                 os.path.join(path_dataset, f"{name}_tordata400.pickle"),
@@ -48,7 +53,7 @@ def load_dataset_deepcorr(path_dataset, load_all_data=False):
             pbar.update(1)
 
     len_tr = len(dataset)
-    print('Dataset length/Amount of true flow pairs: ', len_tr)
+    print('Dataset length/Amount of true flow pairs used: ', len_tr)
 
     return dataset
 
