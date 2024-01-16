@@ -2,8 +2,6 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# evaluation.py
-# Functions for evaluating the trained model and printing metrics.
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc
 from sklearn.model_selection import cross_val_predict
 from shared.utils import save_plot_to_path, save_array_to_file
