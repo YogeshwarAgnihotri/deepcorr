@@ -4,10 +4,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import datetime
 
-from shared.data_loader import load_dataset_deepcorr, load_test_index_deepcorr
+from shared.data_handling import load_dataset_deepcorr, load_test_index_deepcorr
 from shared.utils import create_path
 
-from shared.train_test_split import calc_train_test_indexes, save_test_indexes_to_path
+from shared.train_test_split import calc_train_test_indexes_using_ratio, save_test_indexes_to_path
 from model import build_graph_testing, build_graph_training
 from train_test import train_model
 
@@ -48,7 +48,7 @@ dataset = load_dataset_deepcorr(path_dataset=path_dataset, load_only_min_300_flo
 if training:
     
     # split dataset into training and testing
-    train_indexes, test_indexes = calc_train_test_indexes(dataset, train_ratio)
+    train_indexes, test_indexes = calc_train_test_indexes_using_ratio(dataset, train_ratio)
     
     save_test_indexes_to_path(test_indexes, run_folder_path)
 
