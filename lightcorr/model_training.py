@@ -13,16 +13,19 @@ def train_model(model, training_data, labels):
     return model
 
 def train_classifier_gridSearch(model, training_data, labels, param_grid, **kwargs):
-    # Define multiple scoring metrics
-    scoring = {
-        'accuracy': make_scorer(accuracy_score),
-        'precision': make_scorer(precision_score),
-        'recall': make_scorer(recall_score),
-        'f1_score': make_scorer(f1_score),
-        'roc_auc_score': make_scorer(roc_auc_score)
-    }
+    # Define multiple scoring metrics, commented out for now
+    # scoring = {
+    #     'accuracy': make_scorer(accuracy_score),
+    #     'precision': make_scorer(precision_score),
+    #     'recall': make_scorer(recall_score),
+    #     'f1_score': make_scorer(f1_score),
+    #     'roc_auc_score': make_scorer(roc_auc_score)
+    # }
     
-    grid_search = GridSearchCV(model, scoring, param_grid, **kwargs)
+    #scoring = {'roc_auc_score': make_scorer(roc_auc_score)}
+
+    #grid_search = GridSearchCV(model,param_grid, scoring=scoring, **kwargs)
+    grid_search = GridSearchCV(model,param_grid, **kwargs)
     return run_search_training(grid_search, training_data, labels, 'grid')
 
 def train_classifier_randomSearch(model, training_data, labels, param_distributions, **kwargs):
