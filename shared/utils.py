@@ -5,6 +5,9 @@ import datetime
 import pandas 
 import numpy as np
 
+def check_if_path_exists(path):
+    return os.path.exists(path)
+
 def create_path(path):
     if not os.path.exists(path):
         os.makedirs(path)
@@ -65,14 +68,14 @@ def load_yaml(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
     
-def create_run_folder(base_path):
+def create_run_folder(base_path, run_name):
     """
     Creates a directory for the current run, named with the current date and time.
 
     :param base_path: Base directory where the run folder will be created.
     :return: Path of the created run folder.
     """
-    run_name = f"Date_{datetime.datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}"
+    run_name = f"{datetime.datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}"  + "_" + run_name
     run_folder_path = os.path.join(base_path, "runs", run_name)
     os.makedirs(run_folder_path, exist_ok=True)
     return run_folder_path
@@ -117,3 +120,8 @@ def save_plot_to_path(fig, file_name, save_path):
     create_path(os.path.dirname(save_path))
     # Save the figure to the specified file
     fig.savefig(os.path.join(save_path, file_name), bbox_inches='tight')
+
+def save_args_to_file(args, file_path):
+    with open(file_path, 'w') as file:
+        for arg in vars(args):
+            file.write(f"{arg}: {getattr(args, arg)}\n")
