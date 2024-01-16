@@ -1,0 +1,1 @@
+This folder contains everything to train models from sklearn on flow correlation
