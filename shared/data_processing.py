@@ -149,3 +149,38 @@ def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memm
     print("TESTING set size of false flow pairs: ", len(l2s_test)-len(test_index))
 
     return l2s, labels,l2s_test,labels_test
+
+def truncate_dataset(dataset, training_limit, testing_limit):
+    """
+    Truncate the dataset to the specified limits for training and testing.
+
+    Args:
+        dataset (list): The loaded dataset.
+        training_limit (int): The number of true flow pairs for training.
+        testing_limit (int): The number of true flow pairs for testing.
+
+    Returns:
+        tuple: Two lists containing the truncated dataset for training and testing.
+    """
+    total_limit = training_limit + testing_limit
+    if total_limit > len(dataset):
+        raise ValueError("The sum of training and testing limits exceeds the dataset size.")
+    
+    return dataset[:training_limit], dataset[training_limit:total_limit]
+
+def flatten_arrays(*arrays):
+    """
+    This function flattens multiple arrays into a list of 1D arrays.
+    Useful for flattening the labels
+    """
+    flattened_arrays = [array.flatten() for array in arrays]
+    return tuple(flattened_arrays)
+
+def flatten_generated_flow_pairs(*arrays):
+    """
+    This operation flattens multiple generated flow pairs into a list of 2D arrays.
+    Each input array should be in the format (N, F, M), where N is the number of flow pairs,
+    F is the number of features, and M is the number of samples per feature.
+    """
+    flattened_arrays = [array.reshape(array.shape[0], -1) for array in arrays]
+    return flattened_arrays
