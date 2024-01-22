@@ -1,6 +1,6 @@
 #####################Dataset loading, splitting and generating settings#####################
 load_pregenerated_dataset: True  # If true, load the dataset; otherwise, generate the dataset
-pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
+pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
 
 # Dataset generation settings
 # ONLY USED IF load_pregenerated_dataset IS FALSE
@@ -25,7 +25,7 @@ validation_settings:
   roc_plot_enabled: false  # If true, generate ROC plot
   cross_validation:
     cv: 5  # Number of folds for cross-validation
-    n_jobs: -1  # Number of jobs to run in parallel. -1 means using all processors
+    n_jobs: 1  # Number of jobs to run in parallel. -1 means using all processors
     verbose: 100  # Verbosity level for cross-validation
 ######################################Evaluation Settings######################################
 evaluation_settings:
