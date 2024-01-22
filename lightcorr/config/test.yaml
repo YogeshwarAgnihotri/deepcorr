@@ -12,13 +12,13 @@ load_all_data: False  # If true, load all data; otherwise, only load flows with 
 
 
 ######################################Run Settings###########################################
-model_type: ""  # "decision_tree" , "random_forest", "xgbClassifier"
+model_type: "random_forest"  # "decision_tree" , "random_forest", "xgbClassifier"
 run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"  # Path to the folder where the run folder will be created
 
 hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "random_search")
 selected_hyperparameter_grid: "none"  # Name of the hyperparameter grid to use (see below)
 # Selects which confinguration to use for single model training see below for details
-single_model_training_config: "none" # select one from the single training config below. 
+single_model_training_config: "default" # select one from the single training config below. 
 
 ######################################Validation Settings######################################
 validation_settings:

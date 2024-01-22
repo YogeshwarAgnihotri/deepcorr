@@ -10,7 +10,7 @@ import shutil
 import yaml
 
 from model_training import train_model, train_classifier_gridSearch, train_classifier_randomSearch
-from model_evaluation import cross_validate, evaluate_test_set
+from model_evaluation import custom_cross_validate, evaluate_test_set
 from config_utlis import config_checks, load_config, initialize_model
 
 from shared.utils import StreamToLogger, setup_logger, create_run_folder, export_dataframe_to_csv
@@ -116,7 +116,7 @@ def main():
     # Evaluate the model on the training set with cross validation
     validation_config = config['validation_settings']['cross_validation']
     roc_plot_enabled = config['validation_settings']['roc_plot_enabled']
-    cross_validate(best_model, flattend_flow_pairs_train, flattend_labels_train, roc_plot_enabled, run_folder_path, **validation_config)
+    custom_cross_validate(best_model, flattend_flow_pairs_train, flattend_labels_train, roc_plot_enabled, run_folder_path, **validation_config)
 
     if config['evaluation_settings']['evaluate_on_test_set']:
         # Evaluate the model on the test set
