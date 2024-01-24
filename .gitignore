@@ -10,6 +10,5 @@ logs/
 saved_models/
 temp/
 runs/
-saved_runs/
 config/dt/
 config/rf/

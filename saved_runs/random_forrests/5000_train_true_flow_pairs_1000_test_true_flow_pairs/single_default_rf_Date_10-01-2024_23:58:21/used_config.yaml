@@ -1,0 +1,165 @@
+#####################Dataset loading, splitting and generating settings#####################
+load_pregenerated_dataset: True  # If true, load the dataset; otherwise, generate the dataset
+pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr_5000_1000"  # Path to the preprocessed dataset
+
+# Dataset generation settings
+# ONLY USED IF load_pregenerated_dataset IS FALSE
+base_dataset_path: "/home/yagnihotri/datasets/deepcorr_original_dataset"  # Path to the DeepCorr dataset
+train_ratio: 0.8  # Training set ratio
+flow_size: 300  # Flow sizes
+negative_samples: 1  # Number of negative samples
+load_all_data: False  # If true, load all data; otherwise, only load flows with minimum specified packets
+
+
+######################################Run Settings###########################################
+model_type: "random_forest"  # "decision_tree" , "random_forest"
+run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"  # Path to the folder where the run folder will be created
+
+hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "random_search")
+selected_hyperparameter_grid: "none"  # Name of the hyperparameter grid to use (see below)
+# Selects which confinguration to use for single model training see below for details
+single_model_training_config: "default" # select one from the single training config below. 
+
+######################################Validation Settings######################################
+validation_settings:
+  roc_plot_enabled: true  # If true, generate ROC plot
+  cross_validation:
+    cv: 5  # Number of folds for cross-validation
+    n_jobs: -1  # Number of jobs to run in parallel. -1 means using all processors
+    verbose: 100  # Verbosity level for cross-validation
+
+######################################Evaluation Settings######################################
+evaluation_settings:
+  roc_plot_enabled: false  # If true, generate ROC plot   # TODO IMPLEMENT roc with test
+  evaluate_on_test_set: false  # If true, evaluate the model on the test set
+
+######################################Hyperparameter Settings#################################
+hyperparameter_search_settings:
+  grid_search:
+    verbose: 100  # Verbosity level for hyperparameter search
+    cv: 5  # Number of folds for cross-validation
+    # Default parameters for GridSearchCV
+    refit: 'roc_auc_score'  # Default scoring method
+    error_score: 'raise'  # Default error handling
+    return_train_score: False  # Default setting for returning train scores
+    n_jobs: -1  # Default number of jobs to run in parallel
+  
+  random_search:
+    verbose: 100  # Verbosity level for hyperparameter search
+    cv: 5  # Number of folds for cross-validation
+    n_iter: 1000000  # Number of parameter settings sampled for random search
+    # Default parameters for RandomizedSearchCV
+    refit: 'roc_auc_score'  # Default scoring method
+    pre_dispatch: '2*n_jobs'  # Default pre-dispatch configuration
+    random_state: null  # Default random state
+    error_score: 'raise'  # Default error handling
+    return_train_score: False  # Default setting for returning train scores
+    n_jobs: -1  # Default number of jobs to run in parallel. -1 means all processors
+
+# Hyperparameter Grid (For use with grid or random search)
+# structure:
+#   model_type:
+#     config_name:
+#       hyperparameter_name: [hyperparameter_values]
+#       ...
+hyperparameter_grid:
+  decision_tree:
+    extensive:
+      criterion: ["gini", "entropy"] 
+      splitter: ["best", "random"] 
+      max_depth: [null, 10, 20, 30, 40, 50, 60]
+      min_samples_split: [2, 4, 6, 8, 10] 
+      min_samples_leaf: [1, 2, 3, 4, 5]  
+      max_features: [null, "sqrt", "log2", 0.5, 0.75, 1.0]  
+      class_weight: [null, "balanced", {0: 1, 1: 2}, {0: 1, 1: 3}]  
+      min_impurity_decrease: [0.0, 0.01, 0.02, 0.05] 
+      ccp_alpha: [0.0, 0.01, 0.02, 0.05] 
+    simple:
+      criterion: ["gini", "entropy"] 
+      max_depth: [null, 10, 20, 30] 
+      min_samples_split: [2, 5, 10]  
+      min_samples_leaf: [1, 2, 4]  
+
+  random_forest:
+    simple:
+      n_estimators: [100, 200, 300]
+      max_depth: [null, 10, 20, 30]
+      min_samples_split: [2, 4, 6]
+      min_samples_leaf: [1, 2, 4]
+      max_features: ["sqrt", "log2", null]
+      bootstrap: [True, False]
+      class_weight: [null, "balanced"]
+      n_jobs: [-1]
+    second:
+      n_estimators: [300, 400, 500]
+      max_depth: [10, 15, 20, 25, null]
+      min_samples_split: [3, 4, 5]
+      min_samples_leaf: [2, 3, 4]
+      max_features: ["sqrt", "log2"]
+      bootstrap: [False]
+      class_weight: ["balanced"]
+      n_jobs: [-1]
+    third:
+      n_estimators: [500, 600, 1000]  # Increased upper limit
+      max_depth: [10, 40, null]  # Exploring deeper trees and no limit
+      min_samples_split: [5, 8]  # Slightly increased values
+      min_samples_leaf: [4, 7]  # Slightly increased values
+      max_features: ["sqrt", 0.3, 0.5, null]  # Including 'auto' for all features
+      bootstrap: [True, False]  # Exploring both options
+      class_weight: ["balanced"]
+      n_jobs: [-1]
+
+
+
+######################################Single Model Training Settings########################
+# Single Model Training Settings (For training without hyperparameter search)
+# structure: 
+#   model_type: 
+#     config_name: 
+#       hyperparameter_name: hyperparameter_value
+#       ...
+single_model_training:
+  decision_tree:
+    default:
+      criterion: "gini"  # Function to measure the quality of a split
+      splitter: "best"  # Strategy to choose the split at each node
+      max_depth: null  # Maximum depth of the tree
+      min_samples_split: 2  # Minimum number of samples required to split an internal node
+      min_samples_leaf: 1  # Minimum number of samples required to be at a leaf node
+      min_weight_fraction_leaf: 0.0  # Minimum weighted fraction of the sum total of weights required at a leaf node
+      max_features: null  # Number of features to consider for the best split
+      random_state: null  # Controls the randomness of the estimator
+      max_leaf_nodes: null  # Maximum number of leaf nodes
+      min_impurity_decrease: 0.0  # A node will be split if the decrease in impurity is greater than this value
+      class_weight: null  # Weights associated with classes
+      ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning
+  random_forest:
+    default:
+      n_estimators: 100  # The number of trees in the forest (alternative values could be any integer, like 10, 200, 500)
+      criterion: "gini"  # The function to measure the quality of a split (alternative values: "entropy", "log_loss")
+      max_depth: null  # The maximum depth of each tree (alternatives: any positive integer, or null for no limit)
+      min_samples_split: 2  # The minimum number of samples required to split an internal node (alternatives: any integer greater than 1, or a float for a fraction of the total number of samples)
+      min_samples_leaf: 1  # The minimum number of samples required to be at a leaf node (alternatives: any integer greater than 0, or a float for a fraction of the total number of samples)
+      min_weight_fraction_leaf: 0.0  # The minimum weighted fraction of the sum total of weights required to be at a leaf node (alternative: any float between 0.0 and 0.5)
+      max_features: "sqrt"  # The number of features to consider when looking for the best split (alternatives: "log2", null, any integer or float between (0, 1))
+      max_leaf_nodes: null  # The maximum number of leaf nodes (alternatives: any positive integer, or null for no limit)
+      min_impurity_decrease: 0.0  # A node will be split if this split induces a decrease of impurity greater than this value (alternatives: any non-negative float)
+      bootstrap: true  # Whether bootstrap samples are used when building trees (alternatives: false)
+      oob_score: false  # Whether to use out-of-bag samples to estimate the generalization score (alternatives: true, but only if bootstrap is true)
+      n_jobs: -1  # The number of jobs to run in parallel (alternatives: -1 for using all processors, or any positive integer)
+      random_state: null  # Controls the randomness of the bootstrapping and feature selection (alternatives: any integer for reproducibility)
+      verbose: 0  # Controls the verbosity when fitting and predicting (alternatives: any non-negative integer, where higher values make the process more verbose)
+      warm_start: false  # When set to true, reuse the solution of the previous call to fit and add more estimators (alternatives: true)
+      class_weight: null  # Weights associated with classes (alternatives: "balanced", "balanced_subsample", or a dict of {class_label: weight})
+      ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning (alternatives: any non-negative float)
+      max_samples: null  # If bootstrap is true, the number of samples to draw from X to train each base estimator (alternatives: any int or float between (0, 1] fraction of the total number of samples)
+    best_ever:
+      bootstrap: True
+      class_weight: balanced
+      max_depth: 10
+      max_features: 0.5
+      min_samples_leaf: 7
+      min_samples_split: 8
+      n_estimators: 1000
+      n_jobs: -1
+ 
