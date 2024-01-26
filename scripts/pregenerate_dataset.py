@@ -10,7 +10,7 @@ import argparse
 import json
 
 from shared.utils import StreamToLogger, create_path, save_args_to_file, setup_logger, check_if_path_exists
-from shared.data_handling import load_dataset_deepcorr
+from shared.data_handling import load_dataset_deepcorr, save_memmap_info_flow_pairs_labels
 from shared.data_processing import generate_flow_pairs_to_memmap
 from shared.train_test_split import calc_train_test_indexes_using_ratio, calc_train_test_index_manual_split
 
@@ -55,16 +55,7 @@ def main():
     args_file_path = os.path.join(args.save_directory, 'script_args.txt')
     save_args_to_file(args, args_file_path)
 
-    # Save shapes of the memmap arrays in a JSON file
-    shapes = {
-        "flow_pairs_train_shape": flow_pairs_train.shape,
-        "labels_train_shape": labels_train.shape,
-        "flow_pairs_test_shape": flow_pairs_test.shape,
-        "labels_test_shape": labels_test.shape
-    }
-    shapes_file_path = os.path.join(args.save_directory, 'memmap_shapes.json')
-    with open(shapes_file_path, 'w') as f:
-        json.dump(shapes, f)
+    save_memmap_info_flow_pairs_labels(flow_pairs_train, labels_train, flow_pairs_test, labels_test, args.save_directory)
 
 if __name__ == "__main__":
     main()
