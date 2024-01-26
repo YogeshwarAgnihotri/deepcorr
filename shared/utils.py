@@ -100,14 +100,15 @@ def export_dataframe_to_csv(df, file_name, folder_path, create_folder_if_not_exi
 
     print(f"Data exported to {file_path}")
 
-def save_array_to_file(array, file_name):
+def save_array_to_file(array, file_name, save_path):
     """
     Save a NumPy array to a text file.
 
     :param array: NumPy array to be saved.
     :param file_name: Name of the file where the array will be saved.
     """
-    with open(file_name, 'w') as file:
+    create_path(save_path)
+    with open(os.path.join(save_path, file_name), 'w') as file:
         # Write the shape of the array for reference
         file.write(f"Array Shape: {array.shape}\n\n")
 
