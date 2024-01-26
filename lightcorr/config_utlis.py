@@ -11,13 +11,9 @@ def config_checks(config):
         raise ValueError(f"Config Setting Error: single_model_training_config and hyperparameter_search_type are both none. Cant do nothing.")
     if (config['hyperparameter_search_type'] != 'none' and config['selected_hyperparameter_grid'] == 'none') or (config['hyperparameter_search_type'] == 'none' and config['selected_hyperparameter_grid'] != 'none'):
         raise ValueError("Config Setting Error: Both hyperparameter_search_type and selected_hyperparameter_grid must be set to a value if hyperparamter search is wished, otherwise both must be set to none.")
-
-    # Check if evaluation settings are same
-    if config['evaluation_settings']['evaluate_on_test_set'] == False and config['evaluation_settings']['roc_plot_enabled'] == True:
-        raise ValueError("Config Setting Error: Cant generate ROC plot if evaluation_settings.evaluate_on_test_set is False, since the model is not evaluated on the test set.")
     
     # Basic checks
-    if config['model_type'] is "":
+    if config['model_type'] == "":
         raise ValueError("Config Setting Error: model_type must be set to a value.")
     
 
