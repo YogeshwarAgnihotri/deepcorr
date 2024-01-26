@@ -119,7 +119,7 @@ def save_array_to_file(array, file_name):
 def save_plot_to_path(fig, file_name, save_path):
     create_path(os.path.dirname(save_path))
     # Save the figure to the specified file
-    fig.savefig(os.path.join(save_path, file_name), bbox_inches='tight')
+    fig.savefig(os.path.join(save_path, file_name), bbox_inches='tight', dpi=600)
 
 def save_args_to_file(args, file_path):
     with open(file_path, 'w') as file:
