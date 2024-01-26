@@ -99,3 +99,15 @@ def load_pregenerated_memmap_dataset(path):
 
 
     return l2s, labels, l2s_test, labels_test
+
+def save_memmap_info_flow_pairs_labels(flow_pairs_train, labels_train, flow_pairs_test, labels_test, save_path):
+    # Save shapes of the memmap arrays in a JSON file
+    shapes = {
+        "flow_pairs_train_shape": flow_pairs_train.shape,
+        "labels_train_shape": labels_train.shape,
+        "flow_pairs_test_shape": flow_pairs_test.shape,
+        "labels_test_shape": labels_test.shape
+    }
+    shapes_file_path = os.path.join(save_path, 'memmap_shapes.json')
+    with open(shapes_file_path, 'w') as f:
+        json.dump(shapes, f)
