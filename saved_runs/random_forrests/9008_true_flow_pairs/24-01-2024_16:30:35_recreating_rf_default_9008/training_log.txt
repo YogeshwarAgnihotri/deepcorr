@@ -1,0 +1,31 @@
+
+Model type:
+ random_forest
+Hyperparameter search type: none
+Hyperparameter grid: none
+Single model training config: default
+
+Loading pregenerated memmap dataset...
+Pre-generated dataset loaded successfully! Dataset sizes:
+TRAINING set size (true and false flow pairs total): 18016
+TRAINING set size of true flow pairs: 9008
+TRAINING set size of false flow pairs: 9008
+TESTING set size (true and false flow pairs total): 4504
+TESTING set size of true flow pairs: 2252
+TESTING set size of false flow pairs: 2252
+
+Training the model...
+Training completed in 0d 0h 0m 7.32s
+
+Evaluating the model on the training set with cross validation...
+Finished fold 1/5. Time taken: 5.96 seconds.
+Finished fold 2/5. Time taken: 5.92 seconds.
+Finished fold 3/5. Time taken: 5.88 seconds.
+Finished fold 4/5. Time taken: 6.01 seconds.
+Finished fold 5/5. Time taken: 6.27 seconds.
+All folds completed. Total time taken: 30.05 seconds.
+
+Mean Accuracy: 0.71
+Mean Precision: 0.79
+Mean Recall: 0.59
+Mean F1 Score: 0.67

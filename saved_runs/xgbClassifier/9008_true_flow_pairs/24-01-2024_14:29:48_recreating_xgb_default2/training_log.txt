@@ -1,0 +1,19 @@
+
+Loading pregenerated memmap dataset...
+Pre-generated dataset loaded successfully! Dataset sizes:
+TRAINING set size (true and false flow pairs total): 18016
+TRAINING set size of true flow pairs: 9008
+TRAINING set size of false flow pairs: 9008
+TESTING set size (true and false flow pairs total): 4504
+TESTING set size of true flow pairs: 2252
+TESTING set size of false flow pairs: 2252
+
+Training the model...
+Training completed in 0d 0h 0m 15.02s
+
+Evaluating the model on the training set with cross validation...
+
+Mean Accuracy: 0.81
+Mean Precision: 0.80
+Mean Recall: 0.82
+Mean F1 Score: 0.81

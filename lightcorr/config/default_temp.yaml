@@ -1,10 +1,10 @@
 #####################Dataset loading, splitting and generating settings#####################
 load_pregenerated_dataset: True  # If true, load the dataset; otherwise, generate the dataset
-pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
+pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
 
 # Dataset generation settings
 # ONLY USED IF load_pregenerated_dataset IS FALSE
-base_dataset_path: "/home/yagnihotri/datasets/deepcorr_original_dataset"  # Path to the DeepCorr dataset
+base_dataset_path: "/home/yogeshwar/datasets/deepcorr_original"  # Path to the DeepCorr dataset
 train_ratio: 0.8  # Training set ratio
 flow_size: 300  # Flow sizes
 negative_samples: 1  # Number of negative samples
@@ -13,7 +13,7 @@ load_all_data: False  # If true, load all data; otherwise, only load flows with 
 
 ######################################Run Settings###########################################
 model_type: ""  # "decision_tree" , "random_forest", "xgbClassifier"
-run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"  # Path to the folder where the run folder will be created
+run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
 
 hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "random_search")
 selected_hyperparameter_grid: "none"  # Name of the hyperparameter grid to use (see below)
@@ -22,16 +22,12 @@ single_model_training_config: "none" # select one from the single training confi
 
 ######################################Validation Settings######################################
 validation_settings:
+  run_validation: true # If true, run validation, otherwise skip validation
   roc_plot_enabled: true  # If true, generate ROC plot
   cross_validation:
     cv: 5  # Number of folds for cross-validation
     n_jobs: -1  # Number of jobs to run in parallel. -1 means using all processors
     verbose: 100  # Verbosity level for cross-validation
-
-######################################Evaluation Settings######################################
-evaluation_settings:
-  roc_plot_enabled: false  # If true, generate ROC plot   # TODO IMPLEMENT roc with test
-  evaluate_on_test_set: false  # If true, evaluate the model on the test set
 
 ######################################Hyperparameter Settings#################################
 hyperparameter_search_settings:
@@ -134,6 +130,17 @@ single_model_training:
       min_impurity_decrease: 0.0  # A node will be split if the decrease in impurity is greater than this value
       class_weight: null  # Weights associated with classes
       ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning
+    best:
+      splitter: "best"
+      min_samples_split: 10
+      min_samples_leaf: 2
+      min_impurity_decrease: 0.0
+      max_features: 1.0
+      max_depth: 60
+      criterion: "entropy"
+      class_weight: {0: 1, 1: 2}
+      ccp_alpha: 0.0
+
   random_forest:
     default:
       n_estimators: 100  # The number of trees in the forest (alternative values could be any integer, like 10, 200, 500)
