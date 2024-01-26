@@ -15,13 +15,27 @@ def custom_cross_validate(model, training_data, training_labels, roc_plot_enable
     print("\nEvaluating the model on the training set with cross validation...")
     
     if roc_plot_enabled:
-        fig_linear, ax_linear, fig_log, ax_log, fig_linear_no_mean, ax_linear_no_mean, \
-        fig_log_no_mean, ax_log_no_mean, mean_accuracy, mean_precision, mean_recall, mean_f1 \
-        = custom_cv_roc(model, kwargs.get('cv'), training_data, training_labels, run_folder_path)
-        save_plot_to_path(fig_linear, file_name='roc_curve_mean.png', save_path=run_folder_path)
-        save_plot_to_path(fig_log, file_name='roc_curve_log_mean.png', save_path=run_folder_path)
-        save_plot_to_path(fig_linear_no_mean, file_name='roc_curve_no_mean.png', save_path=run_folder_path)
-        save_plot_to_path(fig_log_no_mean, file_name='roc_curve_log_no_mean.png', save_path=run_folder_path)
+        fig_linear, fig_linear_threshold_points, fig_linear_no_mean, \
+        fig_linear_no_mean_threshold_points, fig_log, fig_log_threshold_points, \
+        fig_log_no_mean, fig_log_no_mean_threshold_points, \
+        mean_accuracy, mean_precision, mean_recall, mean_f1 = \
+        custom_cv_roc(model, kwargs.get('cv'), training_data, training_labels, run_folder_path)
+        
+        # Save the plots
+        linear_folder = os.path.join(run_folder_path, "linear")
+        create_path(linear_folder)
+        save_plot_to_path(fig=fig_linear, file_name="roc_linear.png", save_path=linear_folder)
+        save_plot_to_path(fig=fig_linear_threshold_points, file_name="roc_linear_threshold_points.png", save_path=linear_folder)
+        save_plot_to_path(fig=fig_linear_no_mean, file_name="roc_linear_no_mean.png", save_path=linear_folder)
+        save_plot_to_path(fig=fig_linear_no_mean_threshold_points, file_name="roc_linear_no_mean_threshold_points.png", save_path=linear_folder)
+
+        log_folder = os.path.join(run_folder_path, "log")
+        create_path(log_folder)
+        save_plot_to_path(fig=fig_log, file_name="roc_log.png", save_path=log_folder)
+        save_plot_to_path(fig=fig_log_threshold_points, file_name="roc_log_threshold_points.png", save_path=log_folder)
+        save_plot_to_path(fig=fig_log_no_mean, file_name="roc_log_no_mean.png", save_path=log_folder)
+        save_plot_to_path(fig=fig_log_no_mean_threshold_points, file_name="roc_log_no_mean_threshold_points.png", save_path=log_folder)
+
         print(f"\nMean Accuracy: {mean_accuracy:.2f}")
         print(f"Mean Precision: {mean_precision:.2f}")
         print(f"Mean Recall: {mean_recall:.2f}")
@@ -32,7 +46,7 @@ def custom_cross_validate(model, training_data, training_labels, roc_plot_enable
         results = cross_validate(model, training_data, training_labels, scoring=scoring, **kwargs)
         print(results)
 
-def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False):
+def custom_cv_roc(model, cv, X, y, run_folder_path):
     debug_run_folder_path = os.path.join(run_folder_path, "debug")
     create_path(debug_run_folder_path)
     n_splits = cv
@@ -59,13 +73,17 @@ def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False
     recalls = []
     f1_scores = []
 
-    # Create two figures: one for linear and one for log scale
+    # 4 figures per scale, 2 with mean and 2 without and 2 with threshold points and 2 without
     fig_linear, ax_linear = plt.subplots(figsize=(6, 6))
-    fig_log, ax_log = plt.subplots(figsize=(6, 6))
-
-    # Additional figures without the mean curve
+    fig_linear_threshold_points, ax_linear_threshold_points = plt.subplots(figsize=(6, 6))
     fig_linear_no_mean, ax_linear_no_mean = plt.subplots(figsize=(6, 6))
+    fig_linear_no_mean_threshold_points, ax_linear_no_mean_threshold_points = plt.subplots(figsize=(6, 6))
+    
+    fig_log, ax_log = plt.subplots(figsize=(6, 6))
+    fig_log_threshold_points, ax_log_threshold_points = plt.subplots(figsize=(6, 6))
     fig_log_no_mean, ax_log_no_mean = plt.subplots(figsize=(6, 6))
+    fig_log_no_mean_threshold_points, ax_log_no_mean_threshold_points = plt.subplots(figsize=(6, 6))
+
 
     # Track the start time of cross-validation
     start_time = time.time()
@@ -95,8 +113,8 @@ def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False
             f1_scores.append(f1_score(y[test], y_pred))
             
             # Compute ROC curve with many thresholds
+            # For log cut out the ones with fpr 0
             fpr_linear, tpr_linear, thresholds_linear = roc_curve(y[test], scores, drop_intermediate=False)
-
             # Filter out the zero values from fpr for log scale plotting
             # This is because log(0) is undefined, and the curves should start at the 
             # first non-zero value of fpr
@@ -114,69 +132,66 @@ def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False
                 #print(f"mean_fpr_log: {mean_fpr_log}")
                 #mean_fpr_log = mean_fpr_log[1:]  # Remove the first element of mean_fpr_log because it is 0
                 #print(f"mean_fpr_log: {mean_fpr_log}")
-
-
-            # Combine the arrays into a single array of triplets for debugging
-            save_array_to_file(np.column_stack((fpr_linear, tpr_linear, thresholds_linear)), 
-                               os.path.join(debug_run_folder_path, f"fold_{fold}_fpr_tpr_threshold_linear.txt"))
-            save_array_to_file(np.column_stack((fpr_log, tpr_log, thresholds_log)), 
-                               os.path.join(debug_run_folder_path, f"fold_{fold}_fpr_tpr_threshold_log.txt"))
             
+            # Plotting of the Fold ROC curves
             ax_linear.plot(fpr_linear, tpr_linear, lw=1, alpha=0.3, label=f'Fold {fold}')
+            ax_linear_no_mean.plot(fpr_linear, tpr_linear, lw=1, alpha=0.3, label=f'Fold {fold}')
+            ax_linear_threshold_points.plot(fpr_linear, tpr_linear, lw=1, alpha=0.3, label=f'Fold {fold}')
+            ax_linear_no_mean_threshold_points.plot(fpr_linear, tpr_linear, lw=1, alpha=0.3, label=f'Fold {fold}')
+            
+            ax_log.plot(fpr_log, tpr_log, lw=1, alpha=0.3, label=f'Fold {fold}')
+            ax_log_no_mean.plot(fpr_log, tpr_log, lw=1, alpha=0.3, label=f'Fold {fold}')
+            ax_log_threshold_points.plot(fpr_log, tpr_log, lw=1, alpha=0.3, label=f'Fold {fold}')
+            ax_log_no_mean_threshold_points.plot(fpr_log, tpr_log, lw=1, alpha=0.3, label=f'Fold {fold}')
 
+            # Plotting of the threshold points
+            ax_linear_threshold_points.scatter(fpr_linear, tpr_linear, s=10)  # Add ROC points
+            ax_linear_no_mean_threshold_points.scatter(fpr_linear, tpr_linear, s=10)  # Add ROC points
+            
+            ax_log_threshold_points.scatter(fpr_log, tpr_log, s=10)  # Add ROC points
+            ax_log_no_mean_threshold_points.scatter(fpr_log, tpr_log, s=10)  # Add ROC points
+        
+            # Interpolate sutff for the mean curves
             interp_tpr_linear = np.interp(mean_fpr_linear, fpr_linear, tpr_linear)
-            save_array_to_file(interp_tpr_linear, os.path.join(debug_run_folder_path, f"fold_{fold}_interp_tpr_linear.txt"))
             interp_tpr_linear[0] = 0.0
             tprs_linear.append(interp_tpr_linear)
             aucs_linear.append(auc(fpr_linear, tpr_linear))
-
-            ax_log.plot(fpr_log, tpr_log, lw=1, alpha=0.3, label=f'Fold {fold}')
-
-            ax_linear_no_mean.plot(fpr_linear, tpr_linear, lw=1, alpha=0.3, label=f'Fold {fold}')
-            ax_log_no_mean.plot(fpr_log, tpr_log, lw=1, alpha=0.3, label=f'Fold {fold}')
             
-            if plot_threshhold_points:
-                ax_linear.scatter(fpr_linear, tpr_linear, s=10)
-                ax_log.scatter(fpr_log, tpr_log, s=10)  # Add ROC points
-
             interp_tpr_log = np.interp(mean_fpr_log, fpr_log, tpr_log)
-            save_array_to_file(interp_tpr_log, os.path.join(debug_run_folder_path, f"fold_{fold}_interp_tpr_log.txt"))
             interp_tpr_log[0] = 0.0
             tprs_log.append(interp_tpr_log)
             aucs_log.append(auc(fpr_log, tpr_log))
             
             fold_end = time.time()  # End time for the current fold
             pbar.write(f"Finished fold {fold+1}/{n_splits}. Time taken: {fold_end - fold_start:.2f} seconds.")
+
+            # save for debugging
+            # Combine the arrays into a single array of triplets for debugging
+            save_array_to_file(np.column_stack((fpr_linear, tpr_linear, thresholds_linear)), 
+                               os.path.join(debug_run_folder_path, f"fold_{fold}_fpr_tpr_threshold_linear.txt"))
+            save_array_to_file(np.column_stack((fpr_log, tpr_log, thresholds_log)), 
+                               os.path.join(debug_run_folder_path, f"fold_{fold}_fpr_tpr_threshold_log.txt"))
+            save_array_to_file(interp_tpr_linear, os.path.join(debug_run_folder_path, f"fold_{fold}_interp_tpr_linear.txt"))
+            save_array_to_file(interp_tpr_log, os.path.join(debug_run_folder_path, f"fold_{fold}_interp_tpr_log.txt"))
+
             pbar.update(1)
-            
+    # Stats for the entire cross-validation        
     total_duration = time.time() - start_time
     tqdm.write(f"All folds completed. Total time taken: {total_duration:.2f} seconds.")
-
-
-    save_array_to_file(mean_fpr_log, os.path.join(debug_run_folder_path, f"mean_fpr_log.txt"))
     
-    save_array_to_file(np.array(tprs_linear), os.path.join(debug_run_folder_path, f"tprs_linear.txt"))
+    # Calculate the mean and standard deviation of the interpolated tpr values
     mean_tpr_linear = np.mean(tprs_linear, axis=0)
-    save_array_to_file(mean_tpr_linear, os.path.join(debug_run_folder_path, f"mean_tpr.txt"))
     mean_tpr_linear[-1] = 1.0
     mean_auc_linear = auc(mean_fpr_linear, mean_tpr_linear)
     std_auc_linear = np.std(aucs_linear)
-
-    save_array_to_file(np.array(tprs_log), os.path.join(debug_run_folder_path, f"tprs_log.txt"))
+    # For log the same
     mean_tpr_log = np.mean(tprs_log, axis=0)
-    save_array_to_file(mean_tpr_log, os.path.join(debug_run_folder_path, f"mean_tpr_log.txt"))
     mean_tpr_log[-1] = 1.0
     mean_auc_log = auc(mean_fpr_log, mean_tpr_log)
     std_auc_log = np.std(aucs_log)
 
-    # Combine the arrays into a single array of triplets
-    combined_array = np.column_stack((mean_fpr_linear, mean_tpr_linear))
-    save_array_to_file(combined_array, os.path.join(debug_run_folder_path, f"mean_fpr_tpr_linear.txt"))
-
-    combined_array = np.column_stack((mean_fpr_log, mean_tpr_log))
-    save_array_to_file(combined_array, os.path.join(debug_run_folder_path, f"mean_fpr_tpr_log.txt"))
-
-    # Linear scale plot
+    #################################### Linear plots #############################################
+    # Linear plots that need the mean curve in it
     ax_linear.plot(
         mean_fpr_linear, 
         mean_tpr_linear,
@@ -192,7 +207,41 @@ def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False
     )
     ax_linear.legend(loc="lower right")
 
-    # Log scale plot
+    ax_linear_threshold_points.plot(
+        mean_fpr_linear, 
+        mean_tpr_linear,
+        color="b",
+        label=r"Mean ROC (AUC = %0.2f $\pm$ %0.2f)" % (mean_auc_linear, std_auc_linear),
+        lw=2,
+        alpha=0.8,
+    )
+    ax_linear_threshold_points.set(
+        xlabel="False Positive Rate",
+        ylabel="True Positive Rate",
+        title="Mean ROC curve with variability (Linear Scale)",
+    )
+    ax_linear_threshold_points.legend(loc="lower right")
+    # here also plot the threshold points of the mean curve
+    ax_linear_threshold_points.scatter(mean_fpr_linear, mean_tpr_linear, s=10, color="b")  # Add ROC points
+
+    # Linear plots that don't need the mean curve in it
+    ax_linear_no_mean.set(
+        xlabel="False Positive Rate",
+        ylabel="True Positive Rate",
+        title="Individual ROC curves (Linear Scale)"
+    )
+    ax_linear_no_mean.legend(loc="lower right")
+
+    ax_linear_no_mean_threshold_points.set(
+        xlabel="False Positive Rate",
+        ylabel="True Positive Rate",
+        title="Individual ROC curves (Linear Scale)"
+    )
+    ax_linear_no_mean_threshold_points.legend(loc="lower right")
+    # no need to plot the threshold points of the fold curves here, they are already plotted above
+
+    #################################### Log plots #############################################
+    # Log plots that need the mean curve in it
     ax_log.set_xscale('log')
     ax_log.set_xlim(10**-5, 1)
     ax_log.plot(
@@ -208,15 +257,27 @@ def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False
         ylabel="True Positive Rate",
         title="Mean ROC curve with variability (Log Scale)",
     )
+    ax_log.legend(loc="upper left", fontsize='small', ncol=1, frameon=False)
 
-    # Finalize the figures without the mean curve
-    ax_linear_no_mean.set(
-        xlabel="False Positive Rate",
-        ylabel="True Positive Rate",
-        title="Individual ROC curves (Linear Scale)"
+    ax_log_threshold_points.set_xscale('log')
+    ax_log_threshold_points.set_xlim(10**-5, 1)
+    ax_log_threshold_points.plot(
+        mean_fpr_log,  # This should also be offset if mean_fpr contains 0
+        mean_tpr_log,
+        color="b",
+        label=r"Mean ROC (AUC = %0.2f $\pm$ %0.2f)" % (mean_auc_log, std_auc_log),
+        lw=2,
+        alpha=0.8,
     )
-    ax_linear_no_mean.legend(loc="lower right")
+    ax_log_threshold_points.set(
+        xlabel="False Positive Rate (Log Scale)",
+        ylabel="True Positive Rate",
+        title="Mean ROC curve with variability (Log Scale)",
+    )
+    # here also plot the threshold points of the mean curve
+    ax_log_threshold_points.scatter(mean_fpr_log, mean_tpr_log, s=10, color="b")  # Add ROC points
 
+    # Log plots that don't need the mean curve in it
     ax_log_no_mean.set_xscale('log')
     ax_log_no_mean.set_xlim(10**-5, 1)
     ax_log_no_mean.set(
@@ -226,13 +287,14 @@ def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False
     )
     ax_log_no_mean.legend(loc="upper left", fontsize='small', ncol=1, frameon=False)
 
-    if plot_threshhold_points:
-        ax_linear.scatter(mean_fpr_linear, mean_tpr_linear, s=10, color="b")  # Add ROC points
-        ax_log.scatter(mean_fpr_log, mean_tpr_log, s=10, color="b")  # Add ROC points
-
-    # For the log scale plot legend
-    ax_log.legend(loc="upper left", fontsize='small', ncol=1, frameon=False)
-
+    ax_log_no_mean_threshold_points.set_xscale('log')
+    ax_log_no_mean_threshold_points.set_xlim(10**-5, 1)
+    ax_log_no_mean_threshold_points.set(
+        xlabel="False Positive Rate (Log Scale)",
+        ylabel="True Positive Rate",
+        title="Individual ROC curves (Log Scale)"
+    )
+    # no need to plot the threshold points of the fold curves here, they are already plotted above
 
     # Averages of the metrics
     mean_accuracy = np.mean(accuracies)
@@ -240,5 +302,18 @@ def custom_cv_roc(model, cv, X, y, run_folder_path, plot_threshhold_points=False
     mean_recall = np.mean(recalls)
     mean_f1 = np.mean(f1_scores)
 
-    return fig_linear, ax_linear, fig_log, ax_log, fig_linear_no_mean, ax_linear_no_mean, fig_log_no_mean, ax_log_no_mean, mean_accuracy, mean_precision, mean_recall, mean_f1
+    # Debugging
+    save_array_to_file(mean_fpr_log, os.path.join(debug_run_folder_path, f"mean_fpr_log.txt"))
+    save_array_to_file(np.array(tprs_linear), os.path.join(debug_run_folder_path, f"tprs_linear.txt"))
+    save_array_to_file(mean_tpr_linear, os.path.join(debug_run_folder_path, f"mean_tpr.txt"))
+    save_array_to_file(np.array(tprs_log), os.path.join(debug_run_folder_path, f"tprs_log.txt"))
+    save_array_to_file(mean_tpr_log, os.path.join(debug_run_folder_path, f"mean_tpr_log.txt"))
+    # Combine the arrays into a single array of triplets
+    combined_array = np.column_stack((mean_fpr_linear, mean_tpr_linear))
+    save_array_to_file(combined_array, os.path.join(debug_run_folder_path, f"mean_fpr_tpr_linear.txt"))
+    combined_array = np.column_stack((mean_fpr_log, mean_tpr_log))
+    save_array_to_file(combined_array, os.path.join(debug_run_folder_path, f"mean_fpr_tpr_log.txt"))
 
+    return fig_linear, fig_linear_threshold_points, fig_linear_no_mean, fig_linear_no_mean_threshold_points, \
+              fig_log, fig_log_threshold_points, fig_log_no_mean, fig_log_no_mean_threshold_points, \
+                mean_accuracy, mean_precision, mean_recall, mean_f1
