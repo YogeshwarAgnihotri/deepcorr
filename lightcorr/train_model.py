@@ -7,7 +7,7 @@ import argparse
 import shutil
 import joblib
 
-from model_training import train_model, train_classifier_gridSearch, train_classifier_randomSearch
+from model_training import train_classifier_halvingGridSearch, train_model, train_classifier_gridSearch, train_classifier_randomSearch
 from lightcorr.model_validation import custom_cross_validate
 from config_utlis import config_checks, load_config, initialize_model
 
@@ -99,15 +99,25 @@ def main():
             model, flattend_flow_pairs_train, flattend_labels_train, parameter_grid, **grid_search_config
         ) 
         export_dataframe_to_csv(pandas.DataFrame(cv_results), 'grid_search_cv_results.csv', run_folder_path)
+    
+    elif hyperparameter_search_type == 'halving_grid_search':
+        halving_grid_search_config = config['hyperparameter_search_settings']['halving_grid_search']
+        best_model, best_hyperparameters, cv_results = train_classifier_halvingGridSearch(
+            model, flattend_flow_pairs_train, flattend_labels_train, parameter_grid, **halving_grid_search_config
+        )
+        export_dataframe_to_csv(pandas.DataFrame(cv_results), 'halving_grid_search_cv_results.csv', run_folder_path)
+    
     elif hyperparameter_search_type == 'random_search':
         random_search_config = config['hyperparameter_search_settings']['random_search']
         best_model, best_hyperparameters, cv_results = train_classifier_randomSearch(
             model, flattend_flow_pairs_train, flattend_labels_train, parameter_grid, **random_search_config
         )
         export_dataframe_to_csv(pandas.DataFrame(cv_results), 'random_search_cv_results.csv', run_folder_path)
+    
     elif hyperparameter_search_type == 'none':
         # this is just a model, not the best model :)
         best_model = train_model(model, flattend_flow_pairs_train, flattend_labels_train)
+    
     else:
         raise ValueError(f"Unsupported hyperparameter search type: {hyperparameter_search_type}")
 

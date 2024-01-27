@@ -30,7 +30,7 @@ def initialize_model(config, model_type, search_type):
             # Use predefined parameters for single model training
             model_params = config['single_model_training']['decision_tree'][single_model_training_config]
             return DecisionTreeClassifier(**model_params)
-        elif search_type == 'grid_search' or search_type == 'random_search':
+        elif search_type == 'grid_search' or search_type == 'random_search' or search_type == 'halving_grid_search':
             # Initialize without parameters for hyperparameter search
             return DecisionTreeClassifier()
     if model_type == 'random_forest':
@@ -39,7 +39,7 @@ def initialize_model(config, model_type, search_type):
             # Use predefined parameters for single model training
             model_params = config['single_model_training']['random_forest'][single_model_training_config]
             return RandomForestClassifier(**model_params)
-        elif search_type == 'grid_search' or search_type == 'random_search':
+        elif search_type == 'grid_search' or search_type == 'random_search' or search_type == 'halving_grid_search':
             # Initialize without parameters for hyperparameter search
             return RandomForestClassifier()
     if model_type == 'xgbClassifier':
@@ -48,7 +48,7 @@ def initialize_model(config, model_type, search_type):
             # Use predefined parameters for single model training
             model_params = config['single_model_training']['xgbClassifier'][single_model_training_config]
             return XGBClassifier(**model_params)
-        elif search_type == 'grid_search' or search_type == 'random_search':
+        elif search_type == 'grid_search' or search_type == 'random_search' or search_type == 'halving_grid_search':
             # Initialize without parameters for hyperparameter search
             return XGBClassifier()
 

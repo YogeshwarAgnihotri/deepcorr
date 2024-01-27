@@ -1,4 +1,5 @@
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, HalvingGridSearchCV
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 import time
 from shared.utils import format_time
@@ -11,6 +12,10 @@ def train_model(model, training_data, labels):
 
     print(f"Training completed in {format_time(training_time)}")
     return model
+
+def train_classifier_halvingGridSearch(model, training_data, labels, param_grid, **kwargs):
+    halving_grid_search = HalvingGridSearchCV(model, param_grid, **kwargs)
+    return run_search_training(halving_grid_search, training_data, labels, 'halving_grid')
 
 def train_classifier_gridSearch(model, training_data, labels, param_grid, **kwargs):
     # Define multiple scoring metrics, commented out for now
@@ -35,7 +40,7 @@ def train_classifier_randomSearch(model, training_data, labels, param_distributi
     #     'roc_auc_score': make_scorer(roc_auc_score)
     # }
     
-    random_search = RandomizedSearchCV(model, scoring=scoring, param_distributions=param_distributions, **kwargs)
+    random_search = RandomizedSearchCV(model, param_distributions=param_distributions, **kwargs)
     return run_search_training(random_search, training_data, labels, 'random')
 
 
