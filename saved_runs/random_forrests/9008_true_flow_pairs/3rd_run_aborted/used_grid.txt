@@ -1,0 +1,9 @@
+third:
+    n_estimators: [500, 600, 1000]  # Increased upper limit
+    max_depth: [10, 40, null]  # Exploring deeper trees and no limit
+    min_samples_split: [5, 8]  # Slightly increased values
+    min_samples_leaf: [4, 7]  # Slightly increased values
+    max_features: ["sqrt", 0.3, 0.5, null]  # Including 'auto' for all features
+    bootstrap: [True, False]  # Exploring both options
+    class_weight: ["balanced"]
+    n_jobs: [-1]
