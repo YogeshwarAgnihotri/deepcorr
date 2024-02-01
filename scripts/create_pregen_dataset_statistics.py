@@ -58,7 +58,7 @@ def print_stats_for_flow_pairs(dataset, flow_size):
 def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Print dataset statistics of deepcorr dataset')
-    parser.add_argument('--dataset_path', default= "/home/yagnihotri/datasets/deepcorr_original_dataset/" ,type=str, required=True, help='Path to the base dataset')
+    parser.add_argument('d', '--dataset_path', default= "/home/yagnihotri/datasets/deepcorr_original_dataset/" ,type=str, required=True, help='Path to the base dataset')
 
     # Parse arguments
     args = parser.parse_args()

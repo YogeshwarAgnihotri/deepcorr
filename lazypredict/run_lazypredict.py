@@ -5,6 +5,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import argparse
 import pandas as pd
 from lazypredict.Supervised import LazyClassifier
+from sklearn.metrics import roc_auc_score
+
 from shared.data_handling import load_pregenerated_memmap_dataset
 from shared.data_processing import flatten_generated_flow_pairs, flatten_arrays
 
@@ -19,7 +21,7 @@ def run_lazypredict(pregenerated_dataset_path):
     flattend_labels_train, flattend_labels_test = flatten_arrays(labels_train, labels_test)
 
     # Initialize LazyClassifier
-    clf = LazyClassifier(verbose=100, ignore_warnings=True, custom_metric=None)
+    clf = LazyClassifier(verbose=100, ignore_warnings=True, custom_metric=roc_auc_score)
     models, predictions = clf.fit(flattend_flow_pairs_train, flattend_flow_pairs_test, flattend_labels_train, flattend_labels_test)
 
     # Output the performance results
@@ -28,7 +30,7 @@ def run_lazypredict(pregenerated_dataset_path):
 if __name__ == "__main__":
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Run LazyPredict on a pregenerated dataset')
-    parser.add_argument('--pregenerated_dataset_path', type=str, required=True, help='Path to the pregenerated dataset')
+    parser.add_argument('-pd','--pregenerated_dataset_path', type=str, required=True, help='Path to the pregenerated dataset')
 
     # Parse arguments
     args = parser.parse_args()
