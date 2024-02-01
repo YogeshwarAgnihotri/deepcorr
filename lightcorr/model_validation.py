@@ -65,7 +65,9 @@ def custom_cv_roc(model, cv, X, y, run_folder_path):
 
     min_non_zero_log_fpr = 1
     
-    save_array_to_file(mean_fpr_linear, os.path.join(debug_run_folder_path, f"mean_fpr_linear.txt"))
+    save_array_to_file(mean_fpr_linear, 
+                       "mean_fpr_linear.txt", 
+                       debug_run_folder_path)
 
     # Lists to store metrics for each fold
     accuracies = []
@@ -104,7 +106,9 @@ def custom_cv_roc(model, cv, X, y, run_folder_path):
             
             y_pred = model.predict(X[test])
 
-            save_array_to_file(scores, os.path.join(debug_run_folder_path, f"fold_{fold}_scores.txt"))
+            save_array_to_file(scores, 
+                               f"fold_{fold}_scores.txt",
+                               debug_run_folder_path)
             
             # Calculate metrics
             accuracies.append(accuracy_score(y[test], y_pred))
@@ -167,12 +171,25 @@ def custom_cv_roc(model, cv, X, y, run_folder_path):
 
             # save for debugging
             # Combine the arrays into a single array of triplets for debugging
-            save_array_to_file(np.column_stack((fpr_linear, tpr_linear, thresholds_linear)), 
-                               os.path.join(debug_run_folder_path, f"fold_{fold}_fpr_tpr_threshold_linear.txt"))
-            save_array_to_file(np.column_stack((fpr_log, tpr_log, thresholds_log)), 
-                               os.path.join(debug_run_folder_path, f"fold_{fold}_fpr_tpr_threshold_log.txt"))
-            save_array_to_file(interp_tpr_linear, os.path.join(debug_run_folder_path, f"fold_{fold}_interp_tpr_linear.txt"))
-            save_array_to_file(interp_tpr_log, os.path.join(debug_run_folder_path, f"fold_{fold}_interp_tpr_log.txt"))
+            save_array_to_file(
+                np.column_stack((fpr_linear, tpr_linear, thresholds_linear)), 
+                f"fold_{fold}_fpr_tpr_threshold_linear.txt",
+                debug_run_folder_path)
+            
+            save_array_to_file(
+                np.column_stack((fpr_log, tpr_log, thresholds_log)),
+                f"fold_{fold}_fpr_tpr_threshold_log.txt",
+                debug_run_folder_path)
+            
+            save_array_to_file(
+                interp_tpr_linear,
+                f"fold_{fold}_interp_tpr_linear.txt",
+                debug_run_folder_path)
+            
+            save_array_to_file(
+                interp_tpr_log,
+                f"fold_{fold}_interp_tpr_log.txt",
+                debug_run_folder_path)
 
             pbar.update(1)
     # Stats for the entire cross-validation        
@@ -303,16 +320,48 @@ def custom_cv_roc(model, cv, X, y, run_folder_path):
     mean_f1 = np.mean(f1_scores)
 
     # Debugging
-    save_array_to_file(mean_fpr_log, os.path.join(debug_run_folder_path, f"mean_fpr_log.txt"))
-    save_array_to_file(np.array(tprs_linear), os.path.join(debug_run_folder_path, f"tprs_linear.txt"))
-    save_array_to_file(mean_tpr_linear, os.path.join(debug_run_folder_path, f"mean_tpr.txt"))
-    save_array_to_file(np.array(tprs_log), os.path.join(debug_run_folder_path, f"tprs_log.txt"))
-    save_array_to_file(mean_tpr_log, os.path.join(debug_run_folder_path, f"mean_tpr_log.txt"))
+    save_array_to_file(
+        mean_fpr_log,
+        f"mean_fpr_log.txt",
+        debug_run_folder_path
+    )
+
+    save_array_to_file(
+        np.array(tprs_linear),
+        f"tprs_linear.txt",
+        debug_run_folder_path
+    )   
+
+    save_array_to_file(
+        mean_tpr_linear,
+        f"mean_tpr_linear.txt",
+        debug_run_folder_path
+    )
+
+    save_array_to_file(
+        np.array(tprs_log),
+        f"tprs_log.txt",
+        debug_run_folder_path
+    )
+
+    save_array_to_file(
+        mean_tpr_log,
+        f"mean_tpr_log.txt",
+        debug_run_folder_path
+    )
+
     # Combine the arrays into a single array of triplets
-    combined_array = np.column_stack((mean_fpr_linear, mean_tpr_linear))
-    save_array_to_file(combined_array, os.path.join(debug_run_folder_path, f"mean_fpr_tpr_linear.txt"))
-    combined_array = np.column_stack((mean_fpr_log, mean_tpr_log))
-    save_array_to_file(combined_array, os.path.join(debug_run_folder_path, f"mean_fpr_tpr_log.txt"))
+    save_array_to_file(
+        np.column_stack((mean_fpr_linear, mean_tpr_linear)),
+        f"mean_fpr_tpr_linear.txt",
+        debug_run_folder_path
+    )
+
+    save_array_to_file(
+        np.column_stack((mean_fpr_log, mean_tpr_log)),
+        f"mean_fpr_tpr_log.txt",
+        debug_run_folder_path
+    )
 
     return fig_linear, fig_linear_threshold_points, fig_linear_no_mean, fig_linear_no_mean_threshold_points, \
               fig_log, fig_log_threshold_points, fig_log_no_mean, fig_log_no_mean_threshold_points, \

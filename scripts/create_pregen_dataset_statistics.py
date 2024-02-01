@@ -5,7 +5,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import numpy as np
 import argparse 
 from shared.data_handling import load_dataset_deepcorr
-from shared.utils import save_array_to_file
 import tqdm
 
 #TODO STLL BUGGY, CANT REMEBER WHAT WAS WRONG WITH IT
