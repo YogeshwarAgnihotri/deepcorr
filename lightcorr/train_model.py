@@ -19,8 +19,8 @@ from shared.data_handling import load_dataset_deepcorr, load_pregenerated_memmap
 def main():
     # Parse only the config file path
     parser = argparse.ArgumentParser(description='Train a Classifier on the dataset.')
-    parser.add_argument('--config_path', type=str, required=True, help='Path to the configuration file')
-    parser.add_argument('--run_name', type=str, help='Name of the run followed by date time. If not set the current date and time only will be used.')
+    parser.add_argument('-c', '--config_path', type=str, required=True, help='Path to the configuration file')
+    parser.add_argument('-r','--run_name', type=str, help='Name of the run followed by date time. If not set the current date and time only will be used.')
     args = parser.parse_args() 
 
     # Load configuration
