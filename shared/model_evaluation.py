@@ -94,6 +94,10 @@ def calc_roc_curves(true_labels, predicted_scores, run_folder_path):
     save_array_to_file(array=np.column_stack((fpr, tpr, thresholds)), 
                        file_name="fpr_tpr_threshold", 
                        save_path=debug_run_folder_path)
+    
+    save_array_to_file(array=np.column_stack((fpr_log, tpr, thresholds)), 
+                       file_name="fpr_log_tpr_threshold", 
+                       save_path=debug_run_folder_path)
 
     # Return the figure objects
     return fig_linear, fig_log
