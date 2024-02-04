@@ -11,10 +11,10 @@ from shared.utils import create_run_folder
 
 def main():
     # parameter
-    model_path = "/home/yogeshwar/master_thesis_corr/lightcorr/runs/26-01-2024_20:47:35_debug/model.joblib"
-    pregenerated_dataset_path = "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252"
+    model_path = "/home/yogeshwar/master_thesis_corr/lightcorr/runs/04-02-2024_17:58:02_rf__default_agg/model.joblib"
+    pregenerated_dataset_path = "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252_agg"
     run_folder_path = "/home/yogeshwar/master_thesis_corr/lightcorr"
-    run_name = "test_eval"
+    run_name = "test_rf_default_agg"
 
     run_folder_path = create_run_folder(run_folder_path, run_name)
 
