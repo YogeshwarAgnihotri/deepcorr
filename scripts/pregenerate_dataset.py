@@ -11,7 +11,7 @@ import json
 
 from shared.utils import StreamToLogger, create_path, save_args_to_file, setup_logger, check_if_path_exists
 from shared.data_handling import load_dataset_deepcorr, save_memmap_info_flow_pairs_labels
-from shared.data_processing import generate_flow_pairs_to_memmap
+from shared.data_processing import generate_flow_pairs_to_memmap, generate_aggregate_flow_pairs_to_memmap
 from shared.train_test_split import calc_train_test_indexes_using_ratio, calc_train_test_index_manual_split
 
 def main():
@@ -21,8 +21,11 @@ def main():
     parser.add_argument('--flow_size', type=int, default=300, help='Size of the flow')
     parser.add_argument('--negative_samples', type=int, default=1, help='Number of negative samples to include')
     
+    parser.add_argument('--aggregate_flows', action='store_true', help='Aggregate flows if set')    
     parser.add_argument('--load_all_true_flow_pairs', action='store_true', help='Load all data if set')
+    
     parser.add_argument('--true_flow_pairs_train_ratio', type=float, help='Training set ratio for automatic split')
+    
     parser.add_argument('--true_flow_pairs_manual_split', action='store_true', help='Enable manual split')   
     parser.add_argument('--true_flow_pairs_training_amount', type=int, help='Number of true flow pairs to load for training in manual split')
     parser.add_argument('--true_flow_pairs_testing_amount', type=int, help='Number of true flow pairs to load for testing in manual split')
@@ -46,10 +49,25 @@ def main():
         train_indexes, test_indexes = calc_train_test_index_manual_split(deepcorr_dataset, args.true_flow_pairs_training_amount, args.true_flow_pairs_testing_amount)
     else:
         # Implement automatic splitting logic
-        train_indexes, test_indexes = calc_train_test_indexes_using_ratio(deepcorr_dataset, args.train_ratio)
+        train_indexes, test_indexes = calc_train_test_indexes_using_ratio(deepcorr_dataset, args.true_flow_pairs_train_ratio)
 
-    flow_pairs_train, labels_train, flow_pairs_test, labels_test = generate_flow_pairs_to_memmap(
-        deepcorr_dataset, train_indexes, test_indexes, args.flow_size, args.save_directory, args.negative_samples)
+    if args.aggregate_flows:
+        # Aggregate the flows
+        flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
+            generate_aggregate_flow_pairs_to_memmap(deepcorr_dataset,
+                                                    train_indexes,
+                                                    test_indexes,
+                                                    args.flow_size,
+                                                    args.save_directory,
+                                                    args.negative_samples)
+    else:
+        flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
+            generate_flow_pairs_to_memmap(deepcorr_dataset, 
+                                          train_indexes, 
+                                          test_indexes, 
+                                          args.flow_size, 
+                                          args.save_directory, 
+                                          args.negative_samples)
 
     # Save args to a file in the save directory
     args_file_path = os.path.join(args.save_directory, 'script_args.txt')

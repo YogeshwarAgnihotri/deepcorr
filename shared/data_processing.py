@@ -3,7 +3,7 @@ import tqdm
 import os
 import pickle
 
-from shared.utils import create_path
+from shared.utils import create_path, save_array_to_file
 
 def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memmap_saving_path, negetive_samples):
     print(f"\nGenerating all flow pairs (including {negetive_samples} negative flow pairs for each flow pair in dataset)...")
@@ -184,3 +184,79 @@ def flatten_generated_flow_pairs(*arrays):
     """
     flattened_arrays = [array.reshape(array.shape[0], -1) for array in arrays]
     return flattened_arrays
+
+def aggregate_features(data):
+    """
+    Aggregate the input data by computing the mean, standard deviation, and variance
+    for each channel across the packet sizes/timing values.
+    
+    Args:
+    - data: Input data with shape [18016, 8, 300, 1].
+    
+    Returns:
+    - aggregated_data: Output data with shape [18016, 8, 3, 1], where each channel now has
+      mean, standard deviation, and variance as the features.
+    """
+    # Compute mean, std, and variance across the third axis (packet sizes/timing values)
+    mean = np.mean(data, axis=2, keepdims=True)  # Shape: [18016, 8, 1, 1]
+    std = np.std(data, axis=2, keepdims=True)    # Shape: [18016, 8, 1, 1]
+    variance = np.var(data, axis=2, keepdims=True)  # Shape: [18016, 8, 1, 1]
+    
+    # Concatenate the computed statistics along the third axis to form a single array
+    # Correctly concatenating to get shape [18016, 8, 3, 1]
+    aggregated_data = np.concatenate([mean, std, variance], axis=2)  # Corrected step
+    
+    return aggregated_data
+
+def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, flow_size, memmap_saving_path, negative_samples):
+    """
+    Wrapper function that generates flow pairs, performs feature aggregation on the generated data,
+    and returns the aggregated data as memmap arrays.
+    """
+    # Ensure the saving path exists
+    if not os.path.exists(memmap_saving_path):
+        os.makedirs(memmap_saving_path)
+
+    # Step 1: Generate the flow pairs using the provided function
+    l2s, labels, l2s_test, labels_test = generate_flow_pairs_to_memmap(dataset, 
+                                                                       train_index, 
+                                                                       test_index, 
+                                                                       flow_size, 
+                                                                       memmap_saving_path, 
+                                                                       negative_samples)
+    
+    # Define paths for the aggregated features
+    aggregated_paths = {
+        'train': os.path.join(memmap_saving_path, 'training_flow_pairs'),
+        'test': os.path.join(memmap_saving_path, 'test_flow_pairs')
+    }
+    
+    print("\nAggregating features of training data...")
+    # Step 2: Perform feature aggregation
+    aggregated_train = aggregate_features(l2s)
+
+    print("\nAggregating features of testing data...")
+    aggregated_test = aggregate_features(l2s_test)
+    
+    print("\nSaving aggregated feature data to disk...")
+    # Optionally, save the aggregated features to disk as memmap arrays and then load them
+    aggregated_memmaps = {}
+    for key, data in [('train', aggregated_train), ('test', aggregated_test)]:
+        shape = data.shape
+        dtype = np.float32  # Ensure this matches the data type of your aggregated features
+        aggregated_path = aggregated_paths[key]
+        # Save and immediately load the aggregated data to ensure it's memory-mapped
+        new_memmap = np.memmap(aggregated_path, dtype=dtype, mode='w+', shape=shape)
+        new_memmap[:] = data[:]
+        del new_memmap  # Flush to disk
+        # Load the memmap to return
+        aggregated_memmaps[key] = np.memmap(aggregated_path, dtype=dtype, mode='r', shape=shape)
+
+    save_array_to_file(array=aggregated_memmaps['train'], file_name='training_flow_pairs.txt', save_path=memmap_saving_path)
+    save_array_to_file(array=labels, file_name='training_labels.txt', save_path=memmap_saving_path)
+
+    save_array_to_file(array=aggregated_memmaps['test'], file_name='test_flow_pairs.txt', save_path=memmap_saving_path)
+    save_array_to_file(array=labels_test, file_name='test_labels.txt', save_path=memmap_saving_path)
+
+    # Return memmap arrays for aggregated data along with labels
+    return aggregated_memmaps['train'], labels, aggregated_memmaps['test'], labels_test
