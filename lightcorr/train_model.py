@@ -6,6 +6,8 @@ import pandas
 import argparse
 import shutil
 import joblib
+import numpy as np
+import time
 
 from model_training import train_classifier_halvingGridSearch, train_model, train_classifier_gridSearch, train_classifier_randomSearch
 from lightcorr.model_validation import custom_cross_validate
@@ -17,6 +19,8 @@ from shared.train_test_split import calc_train_test_indexes_using_ratio
 from shared.data_handling import load_dataset_deepcorr, load_pregenerated_memmap_dataset, save_memmap_info_flow_pairs_labels
 
 def main():
+    start_time = time.time()
+    
     # Parse only the config file path
     parser = argparse.ArgumentParser(description='Train a Classifier on the dataset.')
     parser.add_argument('-c', '--config_path', type=str, required=True, help='Path to the configuration file')
@@ -69,6 +73,11 @@ def main():
             flow_size=flow_size, 
             memmap_saving_path=memmap_dataset_path, 
             negetive_samples=negative_samples)
+        
+    # Dosent seem to make any difference in speed, maybe because the dataset is small
+    # Leaving it in for now
+    if config['load_dataset_into_memory']:
+        flow_pairs_train, labels_train, flow_pairs_test, labels_test = [np.array(arr) for arr in (flow_pairs_train, labels_train, flow_pairs_test, labels_test)]
         
     # for debugging TODO remove later
     #export_dataframe_to_csv(pandas.DataFrame(flow_pairs_train), 'flow_pairs_train_before_flattening.csv', run_folder_path)
@@ -136,7 +145,8 @@ def main():
         print("\nSaving generated dataset to run folder...")
         save_memmap_info_flow_pairs_labels(flow_pairs_train, labels_train, flow_pairs_test, labels_test, run_folder_path)
 
-
+    end_time = time.time()
+    print(f"\nFull training process finished in {end_time - start_time} seconds.")
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,8 @@ flow_size: 300  # Flow sizes
 negative_samples: 1  # Number of negative samples
 load_all_data: False  # If true, load all data; otherwise, only load flows with minimum specified packets
 
+# Load dataset fully into memory, if false keeps using memmap arrays
+load_dataset_into_memory: False
 
 ######################################Run Settings###########################################
 model_type: ""  # "decision_tree" , "random_forest", "xgbClassifier"
