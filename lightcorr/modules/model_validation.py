@@ -11,6 +11,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
+def perform_validation(trained_model, 
+                       flattened_flow_pairs_train, 
+                       flattened_labels_train, 
+                       config, 
+                       run_folder_path):
+    if config['validation_settings']['run_validation']:
+        # Validate the model on the training set with cross validation
+        validation_config = config['validation_settings']['cross_validation']
+        roc_plot_enabled = config['validation_settings']['roc_plot_enabled']
+        custom_cross_validate(trained_model, 
+                              flattened_flow_pairs_train, 
+                              flattened_labels_train,
+                              roc_plot_enabled, 
+                              run_folder_path, 
+                              **validation_config)
+
 def custom_cross_validate(model, training_data, training_labels, roc_plot_enabled, run_folder_path, **kwargs):
     print("\nEvaluating the model on the training set with cross validation...")
     

@@ -4,6 +4,7 @@ import yaml
 import datetime
 import pandas 
 import numpy as np
+import shutil
 
 def check_if_path_exists(path):
     return os.path.exists(path)
@@ -129,3 +130,8 @@ def save_args_to_file(args, file_path):
     with open(file_path, 'w') as file:
         for arg in vars(args):
             file.write(f"{arg}: {getattr(args, arg)}\n")
+
+def copy_file(src, dst):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    shutil.copy(src, dst)
