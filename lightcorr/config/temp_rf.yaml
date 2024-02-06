@@ -1,10 +1,13 @@
 #####################Dataset loading, splitting and generating settings#####################
 load_pregenerated_dataset: True  # If true, load the dataset; otherwise, generate the dataset
 pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
+#pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
 
 # Dataset generation settings
 # ONLY USED IF load_pregenerated_dataset IS FALSE
 base_dataset_path: "/home/yogeshwar/datasets/deepcorr_original"  # Path to the DeepCorr dataset
+#base_dataset_path: "/home/yagnihotri/datasets/deepcorr_original"  # Path to the DeepCorr dataset
+
 train_ratio: 0.8  # Training set ratio
 flow_size: 300  # Flow sizes
 negative_samples: 1  # Number of negative samples
@@ -16,11 +19,12 @@ load_dataset_into_memory: False
 ######################################Run Settings###########################################
 model_type: "random_forest"  # "decision_tree" , "random_forest", "xgbClassifier"
 run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
+#run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"
 
 hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "halving_grid_search" "random_search")
 selected_hyperparameter_grid: "none"  # Name of the hyperparameter grid to use (see below)
 # Selects which confinguration to use for single model training see below for details
-single_model_training_config: "default" # select one from the single training config below. 
+single_model_training_config: "none" # select one from the single training config below. 
 
 ######################################Validation Settings######################################
 validation_settings:
@@ -76,23 +80,6 @@ hyperparameter_search_settings:
 #       hyperparameter_name: [hyperparameter_values]
 #       ...
 hyperparameter_grid:
-  decision_tree:
-    extensive:
-      criterion: ["gini", "entropy"] 
-      splitter: ["best", "random"] 
-      max_depth: [null, 10, 20, 30, 40, 50, 60]
-      min_samples_split: [2, 4, 6, 8, 10] 
-      min_samples_leaf: [1, 2, 3, 4, 5]  
-      max_features: [null, "sqrt", "log2", 0.5, 0.75, 1.0]  
-      class_weight: [null, "balanced", {0: 1, 1: 2}, {0: 1, 1: 3}]  
-      min_impurity_decrease: [0.0, 0.01, 0.02, 0.05] 
-      ccp_alpha: [0.0, 0.01, 0.02, 0.05] 
-    simple:
-      criterion: ["gini", "entropy"] 
-      max_depth: [null, 10, 20, 30] 
-      min_samples_split: [2, 5, 10]  
-      min_samples_leaf: [1, 2, 4]  
-
   random_forest:
     simple:
       n_estimators: [100, 200, 300]
@@ -131,19 +118,6 @@ hyperparameter_grid:
       class_weight: ["balanced"]
       n_jobs: [-1]
 
-  xgbClassifier:
-    simple:
-      n_estimators: [100, 200, 300, 1000]  # Added extreme upper limit
-      max_depth: [3, 6, 9, 15]  # Included a deeper tree option
-      learning_rate: [0.01, 0.1, 0.2, 0.001]  # Included a very low learning rate
-      subsample: [0.7, 0.8, 0.9, 0.1]  # Added a very low subsample rate
-      colsample_bytree: [0.7, 0.8, 0.9, 0.1]  # Included a very low column sample rate
-      n_jobs: [null]
-
-
-
-
-
 ######################################Single Model Training Settings########################
 # Single Model Training Settings (For training without hyperparameter search)
 # structure: 
@@ -152,31 +126,6 @@ hyperparameter_grid:
 #       hyperparameter_name: hyperparameter_value
 #       ...
 single_model_training:
-  decision_tree:
-    default:
-      criterion: "gini"  # Function to measure the quality of a split
-      splitter: "best"  # Strategy to choose the split at each node
-      max_depth: null  # Maximum depth of the tree
-      min_samples_split: 2  # Minimum number of samples required to split an internal node
-      min_samples_leaf: 1  # Minimum number of samples required to be at a leaf node
-      min_weight_fraction_leaf: 0.0  # Minimum weighted fraction of the sum total of weights required at a leaf node
-      max_features: null  # Number of features to consider for the best split
-      random_state: null  # Controls the randomness of the estimator
-      max_leaf_nodes: null  # Maximum number of leaf nodes
-      min_impurity_decrease: 0.0  # A node will be split if the decrease in impurity is greater than this value
-      class_weight: null  # Weights associated with classes
-      ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning
-    best:
-      splitter: "best"
-      min_samples_split: 10
-      min_samples_leaf: 2
-      min_impurity_decrease: 0.0
-      max_features: 1.0
-      max_depth: 60
-      criterion: "entropy"
-      class_weight: {0: 1, 1: 2}
-      ccp_alpha: 0.0
-
   random_forest:
     default:
       n_estimators: 100  # The number of trees in the forest (alternative values could be any integer, like 10, 200, 500)
@@ -206,24 +155,3 @@ single_model_training:
       min_samples_split: 8
       n_estimators: 1000
       n_jobs: -1
-  xgbClassifier:
-    default:
-      booster: "gbtree"  # Type of booster (alternatives: "gblinear" or "dart")
-      eta: 0.3  # Learning rate (alternatives: any float value, typically between 0 and 1)
-      gamma: 0  # Minimum loss reduction required to make a further partition (alternatives: any non-negative float)
-      max_depth: 6  # Maximum depth of a tree (alternatives: any positive integer)
-      min_child_weight: 1  # Minimum sum of instance weight (hessian) needed in a child (alternatives: any non-negative integer)
-      max_delta_step: 0  # Maximum delta step we allow each leaf output (alternatives: any non-negative integer)
-      subsample: 1  # Subsample ratio of the training instances (alternatives: any float between 0 and 1)
-      colsample_bytree: 1  # Subsample ratio of columns when constructing each tree (alternatives: any float between 0 and 1)
-      colsample_bylevel: 1  # Subsample ratio of columns for each level (alternatives: any float between 0 and 1)
-      colsample_bynode: 1  # Subsample ratio of columns for each split (alternatives: any float between 0 and 1)
-      lambda: 1  # L2 regularization term on weights (alternatives: any non-negative float)
-      alpha: 0  # L1 regularization term on weights (alternatives: any non-negative float)
-      tree_method: "auto"  # The tree construction algorithm (alternatives: "exact", "approx", "hist", "gpu_hist")
-      scale_pos_weight: 1  # Balancing of positive and negative weights (alternatives: any positive float)
-      objective: "binary:logistic"  # Learning task and the corresponding learning objective (alternatives: "multi:softmax", "reg:squarederror", etc.)
-      eval_metric: "error"  # Evaluation metric for validation data (alternatives: "logloss", "auc", "rmse", etc.)
-      seed: null  # Random number seed (alternatives: any integer)
-      n_jobs: -1  # Number of parallel threads (alternatives: -1 for using all processors, or any positive integer)
-      verbosity: 1  # Verbosity of printing messages (alternatives: 0 (silent), 1 (warning), 2 (info), 3 (debug))
