@@ -21,7 +21,7 @@ model_type: "xgbClassifier"  # "decision_tree" , "random_forest", "xgbClassifier
 run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
 #run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"
 
-hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "halving_grid_search" "random_search")
+hyperparameter_search_strategy: "none"  # Type of hyperparameter search ("none", "grid_search", "halving_grid_search" "random_search")
 selected_hyperparameter_grid: "none"  # Name of the hyperparameter grid to use (see below)
 
 ######################################Validation Settings######################################

@@ -6,7 +6,10 @@ import time
 
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(
+    0, 
+    os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    )
 
 import pandas
 
@@ -20,7 +23,8 @@ from lightcorr.model_validation import (
 )
 
 from config_utlis import (
-    config_checks_training, load_config, init_model_training,
+    config_checks_hyperparameter_tuning, load_config, 
+    init_model_hyperparameter_tuning,
 )
 
 from shared.utils import (
@@ -42,8 +46,41 @@ from shared.data_handling import (
     save_memmap_info_flow_pairs_labels,
 )
 
+def perform_hyperparameter_search(search_strategy,
+                                   model, 
+                                   X_train, 
+                                   y_train, 
+                                   parameter_grid, 
+                                   config, 
+                                   output_path):
+    # Retrieve the specific search configuration
+    search_config = config['hyperparameter_search_settings'][search_strategy]
+    
+    # Map of search type to function
+    search_functions = {
+        'grid_search': train_classifier_gridSearch,
+        'halving_grid_search': train_classifier_halvingGridSearch,
+        'random_search': train_classifier_randomSearch
+    }
+    
+    if search_strategy in search_functions:
+        best_model, best_hyperparameters, cv_results = (
+            search_functions[search_strategy](
+            model, X_train, y_train, parameter_grid, **search_config))
+        
+        # Export results to CSV
+        results_df = pandas.DataFrame(cv_results)
+        export_dataframe_to_csv(results_df, 
+                                f"{search_strategy}_cv_results.csv", 
+                                output_path)
+    else:
+        raise ValueError(f"Unsupported hyperparameter search\
+                          type: {search_strategy}")
+    
+    return best_model, best_hyperparameters
+
 def main():
-    """Train a Classifier on the dataset."""
+    """Tune hyperparameters for a Classifier using a dataset."""
     start_time = time.time()
     parser = argparse.ArgumentParser(
         description='Train a Classifier on the dataset.'
@@ -56,25 +93,27 @@ def main():
         '-r', '--run_name', type=str, 
         help='Name of the run followed by date time. \
             If not set the current date and time only will be used.'
+            
     )
     args = parser.parse_args()
 
     config = load_config(args.config_path)
-    config_checks_training(config)
+    config_checks_hyperparameter_tuning(config)
 
-    run_folder_path = create_run_folder(
-        config['run_folder_path'], args.run_name
-    )
+    run_folder_path = create_run_folder(config['run_folder_path'], 
+                                        args.run_name)
     output_file_path = os.path.join(run_folder_path, "training_log.txt")
     logger = setup_logger('TrainingLogger', output_file_path)
     sys.stdout = StreamToLogger(logger, sys.stdout)
 
     print("\nModel type:", config['model_type'])
-    print("Selected Model Config:", 
-          config['selected_model_configs'])
-
+    print("Hyperparameter search type:", 
+          config['hyperparameter_search_strategy'])
+    print("Selected hyperparameter grid:",
+          config['selected_hyperparameter_grid'])
+    
     config_file_destination = os.path.join(
-        run_folder_path, "used_config_train.yaml"
+        run_folder_path, "used_config_hyperparameter_tune.yaml"
     )
     shutil.copy(args.config_path, config_file_destination)
 
@@ -122,7 +161,8 @@ def main():
 
     # Flatten the data. Created a 2D array from the 4D array.
     # e.g., (1000, 8, 100, 1) -> (1000, 800)
-    flattened_flow_pairs_train = flatten_generated_flow_pairs(flow_pairs_train)[0]
+    flattened_flow_pairs_train = (
+        flatten_generated_flow_pairs(flow_pairs_train)[0])
 
     # Flatten the labels. Created a 1D array from the 2D array.
     # e.g., (1000, 1) -> (1000,)
@@ -130,17 +170,35 @@ def main():
 
     # Model initialization
     model_type = config['model_type']
-    model = init_model_training(config, model_type)
+    model = init_model_hyperparameter_tuning(model_type)
 
-    trained_model = train_model(model, 
-                                flattened_flow_pairs_train, 
-                                flattened_labels_train)
+    hyperparameter_search_strategy = config['hyperparameter_search_strategy']
 
+    # Dynamically select the hyperparameter grid
+    if hyperparameter_search_strategy != 'none':
+        selected_hyperparameter_grid = config['selected_hyperparameter_grid']
+        parameter_grid = config['hyperparameter_grid'][model_type].get(
+            selected_hyperparameter_grid, {})
+
+    # Hyperparameter search or training
+    if hyperparameter_search_strategy != 'none':
+        best_model, best_hyperparameters = \
+            perform_hyperparameter_search(hyperparameter_search_strategy, 
+                                          model, 
+                                          flattened_flow_pairs_train,
+                                          flattened_labels_train, 
+                                          parameter_grid, 
+                                          config, 
+                                          run_folder_path)
+    else:
+        raise ValueError("Hyperparameter search type is 'none' or not \
+                         defined.")
+    
     if config['validation_settings']['run_validation']:
         # Validate the model on the training set with cross validation
         validation_config = config['validation_settings']['cross_validation']
         roc_plot_enabled = config['validation_settings']['roc_plot_enabled']
-        custom_cross_validate(trained_model, 
+        custom_cross_validate(best_model, 
                               flattened_flow_pairs_train, 
                               flattened_labels_train,
                               roc_plot_enabled, 
@@ -148,18 +206,21 @@ def main():
                               **validation_config)
 
     # Save model for later evaluation or prediction making
-    joblib.dump(trained_model, os.path.join(run_folder_path, 'model.joblib'))
+    joblib.dump(best_model, os.path.join(run_folder_path, 'model.joblib'))
 
     if not config['load_pregenerated_dataset']:
         # In this case, the dataset is generated by this script and not loaded
         # from a pregenerated memmap file. Therefore, save the used dataset.
         print("\nSaving generated dataset to run folder...")
-        save_memmap_info_flow_pairs_labels(
-            flow_pairs_train, labels_train, flow_pairs_test, labels_test, run_folder_path)
+        save_memmap_info_flow_pairs_labels(flow_pairs_train, 
+                                           labels_train, 
+                                           flow_pairs_test, 
+                                           labels_test, 
+                                           run_folder_path)
 
     end_time = time.time()
-    print(f"\nFull training process finished in {end_time - start_time} seconds.")
-
-
+    print(f"\nFull training process finished in {end_time - start_time} \
+          seconds.")
+    
 if __name__ == "__main__":
     main()

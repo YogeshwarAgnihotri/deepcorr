@@ -19,7 +19,7 @@ load_dataset_into_memory: False
 
 ######################################Run Settings###########################################
 model_type: "xgbClassifier"  # "decision_tree" , "random_forest", "xgbClassifier"
-single_model_training_config: 
+selected_model_configs: 
   "none" 
 
 run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
@@ -35,13 +35,12 @@ validation_settings:
     verbose: 100  # Verbosity level for cross-validation
 
 ######################################Single Model Training Settings########################
-# Single Model Training Settings (For training without hyperparameter search)
 # structure: 
 #   model_type: 
 #     config_name: 
 #       hyperparameter_name: hyperparameter_value
 #       ...
-single_model_training:
+model_configs:
   xgbClassifier:
     default:
       booster: "gbtree"  # Type of booster (alternatives: "gblinear" or "dart")

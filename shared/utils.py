@@ -75,6 +75,9 @@ def create_run_folder(base_path, run_name):
     :param base_path: Base directory where the run folder will be created.
     :return: Path of the created run folder.
     """
+    if run_name is None:
+        run_name = ""
+
     run_name = f"{datetime.datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}"  + "_" + run_name
     run_folder_path = os.path.join(base_path, "runs", run_name)
     os.makedirs(run_folder_path, exist_ok=True)

@@ -20,7 +20,7 @@ load_dataset_into_memory: False
 
 ######################################Run Settings###########################################
 model_type: "random_forest"  # "decision_tree" , "random_forest", "xgbClassifier"
-single_model_training_config: # select one to multiple configurations from below
+selected_model_configs: # select one to multiple configurations from below
   "default" 
   "best_ever"
 
@@ -38,13 +38,12 @@ validation_settings:
 
 
 ######################################Single Model Training Settings########################
-# Single Model Training Settings (For training without hyperparameter search)
 # structure: 
 #   model_type: 
 #     config_name: 
 #       hyperparameter_name: hyperparameter_value
 #       ...
-single_model_training:
+model_configs:
   random_forest:
     default:
       n_estimators: 100  # The number of trees in the forest (alternative values could be any integer, like 10, 200, 500)

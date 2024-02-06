@@ -3,54 +3,44 @@ import yaml
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
-def config_checks(config):
-    # About hyperparameter search or solo training
-    if config['hyperparameter_search_type'] != 'none' and config['single_model_training_config'] != 'none':
-        raise ValueError(f"Config Setting Error: Single_model_training_config must be None when hyperparameter_search_type is not none. Cant search for hyperparamers and traning a single model at the same time.")
-    if config['hyperparameter_search_type'] == 'none' and config['single_model_training_config'] == 'none':
-        raise ValueError(f"Config Setting Error: single_model_training_config and hyperparameter_search_type are both none. Cant do nothing.")
-    if (config['hyperparameter_search_type'] != 'none' and config['selected_hyperparameter_grid'] == 'none') or (config['hyperparameter_search_type'] == 'none' and config['selected_hyperparameter_grid'] != 'none'):
-        raise ValueError("Config Setting Error: Both hyperparameter_search_type and selected_hyperparameter_grid must be set to a value if hyperparamter search is wished, otherwise both must be set to none.")
+def config_checks_hyperparameter_tuning(config):    
+    if ((config['hyperparameter_search_strategy'] == 'none')
+        or (config['selected_hyperparameter_grid'] == 'none')):
+        raise ValueError(f"Config Setting Error: \
+                         hyperparameter_search_strategy and \
+                         selected_hyperparameter_grid must be set to a value.")
     
-    # Basic checks
-    if config['model_type'] == "":
-        raise ValueError("Config Setting Error: model_type must be set to a value.")
-    
+def config_checks_training(config):
+    if config['selected_model_configs'] == 'none':
+        raise ValueError("Config Setting Error: At least one model config \
+                         must be set.")
 
-    
 def load_config(config_path):
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
     return config
+    
+def init_model_training(config, model_type):
+    selected_model_config = config['selected_model_configs']
+    model_params = (config['model_configs']
+                    [model_type]
+                    [selected_model_config])
 
-def initialize_model(config, model_type, search_type):
     if model_type == 'decision_tree':
-        if search_type == 'none':
-            single_model_training_config = config['single_model_training_config']
-            # Use predefined parameters for single model training
-            model_params = config['single_model_training']['decision_tree'][single_model_training_config]
-            return DecisionTreeClassifier(**model_params)
-        elif search_type == 'grid_search' or search_type == 'random_search' or search_type == 'halving_grid_search':
-            # Initialize without parameters for hyperparameter search
-            return DecisionTreeClassifier()
-    if model_type == 'random_forest':
-        if search_type == 'none':
-            single_model_training_config = config['single_model_training_config']
-            # Use predefined parameters for single model training
-            model_params = config['single_model_training']['random_forest'][single_model_training_config]
-            return RandomForestClassifier(**model_params)
-        elif search_type == 'grid_search' or search_type == 'random_search' or search_type == 'halving_grid_search':
-            # Initialize without parameters for hyperparameter search
-            return RandomForestClassifier()
-    if model_type == 'xgbClassifier':
-        if search_type == 'none':
-            single_model_training_config = config['single_model_training_config']
-            # Use predefined parameters for single model training
-            model_params = config['single_model_training']['xgbClassifier'][single_model_training_config]
-            return XGBClassifier(**model_params)
-        elif search_type == 'grid_search' or search_type == 'random_search' or search_type == 'halving_grid_search':
-            # Initialize without parameters for hyperparameter search
-            return XGBClassifier()
-
+        return DecisionTreeClassifier(**model_params)
+    elif model_type == 'random_forest':
+        return RandomForestClassifier(**model_params)
+    elif model_type == 'xgbClassifier':
+        return XGBClassifier(**model_params)
+    else:
+        raise ValueError(f"Unsupported model type: {model_type}")
+    
+def init_model_hyperparameter_tuning(model_type):
+    if model_type == 'decision_tree':
+        return DecisionTreeClassifier()
+    elif model_type == 'random_forest':
+        return RandomForestClassifier()
+    elif model_type == 'xgbClassifier':
+        return XGBClassifier()
     else:
         raise ValueError(f"Unsupported model type: {model_type}")
