@@ -4,36 +4,45 @@ import joblib
 import numpy as np
 import time
 
+# Needed to find the other modules. Dont really like this solution.
 import sys
 import os
-sys.path.insert(
-    0, 
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    )
+sys.path.insert(0, 
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__), '../modules')))
+sys.path.insert(0, 
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__), '../..')))
 
 import pandas
 
 from model_training import (
-    train_classifier_halvingGridSearch, train_model, 
-    train_classifier_gridSearch, train_classifier_randomSearch
+    train_classifier_halvingGridSearch,
+    train_classifier_gridSearch, 
+    train_classifier_randomSearch
 )
 
-from lightcorr.model_validation import (
+from model_validation import (
     custom_cross_validate,
 )
 
 from config_utlis import (
-    config_checks_hyperparameter_tuning, load_config, 
+    config_checks_hyperparameter_tuning, 
+    load_config, 
     init_model_hyperparameter_tuning,
 )
 
 from shared.utils import (
-    StreamToLogger, setup_logger, 
+    StreamToLogger, 
+    setup_logger, 
     create_run_folder, export_dataframe_to_csv,
 )
 
 from shared.data_processing import (
-    generate_flow_pairs_to_memmap, flatten_arrays, 
+    generate_flow_pairs_to_memmap, 
+    flatten_arrays, 
     flatten_generated_flow_pairs,
 )
 
@@ -42,7 +51,8 @@ from shared.train_test_split import (
 )
 
 from shared.data_handling import (
-    load_dataset_deepcorr, load_pregenerated_memmap_dataset, 
+    load_dataset_deepcorr, 
+    load_pregenerated_memmap_dataset, 
     save_memmap_info_flow_pairs_labels,
 )
 
@@ -219,8 +229,8 @@ def main():
                                            run_folder_path)
 
     end_time = time.time()
-    print(f"\nFull training process finished in {end_time - start_time} \
-          seconds.")
+    print(f"\nFull training process finished in \
+          {end_time - start_time} seconds.")
     
 if __name__ == "__main__":
     main()

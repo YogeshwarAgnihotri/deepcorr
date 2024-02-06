@@ -2,6 +2,11 @@ from sklearn.experimental import enable_halving_search_cv
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, HalvingGridSearchCV
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 import time
+
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from shared.utils import format_time
 
 def train_model(model, training_data, labels):
