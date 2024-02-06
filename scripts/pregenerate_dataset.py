@@ -1,8 +1,4 @@
 # quick cmd to run this script: 
-""" 
-python home/yagnihotri/projects/corr/scripts/pregenerate_dataset.py --dataset_path=/home/yagnihotri/datasets/deepcorr_original_dataset/ --save_directory=/home/yagnihotri/datasets/deepcorr_5000_1000_2 --negative_samples=1 --load_all_true_flow_pairs --true_flow_pairs_manual_split --true_flow_pairs_training_amount 5000 --true_flow_pairs_testing_amount 1000
-
-"""
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

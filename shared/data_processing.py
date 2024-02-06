@@ -43,7 +43,6 @@ def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memm
         l2s[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
         l2s[index,7,:,0]=np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0
 
-
         if index % (negetive_samples+1) !=0:
             #print(index, len(nears))
             print(index)
@@ -77,10 +76,7 @@ def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memm
 
             labels[index,0]=0
             index+=1
-
-
-
-
+    
     #lsh.setup((X_test / np.linalg.norm(X_test,axis=1,keepdims=True)) .astype(np.float64))
     index_hard=0
     num_hard_test=0
@@ -260,3 +256,18 @@ def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, fl
 
     # Return memmap arrays for aggregated data along with labels
     return aggregated_memmaps['train'], labels, aggregated_memmaps['test'], labels_test
+
+def minimum_padding(np_array, min_length):
+    """
+        Pad the input numpy array with zeros to reach the minimum length specified.
+    """
+    if len(np_array) >= min_length:
+        return np_array
+    else:
+        #print("Before padding shape: ", np_array.shape)
+        #print("Before padding content"  , np_array)
+        padded_array = np.pad(np_array, (0, min_length - len(np_array)), 'constant')
+
+        #print("After padding shape: ", padded_array.shape)  
+        #print("After padding content"  , padded_array)
+        return padded_array
