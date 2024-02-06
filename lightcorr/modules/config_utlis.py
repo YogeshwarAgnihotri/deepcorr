@@ -11,21 +11,18 @@ def config_checks_hyperparameter_tuning(config):
                          selected_hyperparameter_grid must be set to a value.")
     
 def config_checks_training(config):
-    if config['selected_model_configs'] == 'none':
-        raise ValueError("Config Setting Error: At least one model config \
-                         must be set.")
+    # Check if 'runs' is empty
+    runs = config.get('runs', {})
+
+    if not runs:
+        raise ValueError("Config Setting Error: 'runs' is empty.")
 
 def load_config(config_path):
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
     return config
     
-def init_model_training(config, model_type):
-    selected_model_config = config['selected_model_configs']
-    model_params = (config['model_configs']
-                    [model_type]
-                    [selected_model_config])
-
+def init_model_for_training(model_type, model_params):
     if model_type == 'decision_tree':
         return DecisionTreeClassifier(**model_params)
     elif model_type == 'random_forest':

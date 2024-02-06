@@ -1,3 +1,4 @@
+import numpy as np
 from shared.data_processing import (
     generate_flow_pairs_to_memmap, 
 )
@@ -12,44 +13,17 @@ from shared.data_handling import (
     save_memmap_info_flow_pairs_and_labels, 
 )
 
-def load_prepare_dataset(config, run_folder_path):
+def load_prepare_dataset(pregenerated_dataset_path, load_data_set_into_memory):
     """Load and prepare the dataset for training."""
-    if config['load_pregenerated_dataset']:
-            # Load pregenerated dataset
-            pregenerated_dataset_path = config['pregenerated_dataset_path']
-            flow_pairs_train, labels_train, flow_pairs_test, labels_test = (
-                load_pregenerated_memmap_dataset(pregenerated_dataset_path)
-            )
-    else:
-        # Generate own dataset for this run
-        # Extract settings from config
-        dataset_path = config['base_dataset_path']
-        train_ratio = config['train_ratio']
-        flow_size = config['flow_size']
-        negative_samples = config['negative_samples']
-        load_all_data = config['load_all_data']
-        memmap_dataset_path = os.path.join(run_folder_path, 'memmap_dataset')
-
-        # Load dataset
-        deepcorr_dataset = load_dataset_deepcorr(dataset_path, load_all_data)
-        train_indexes, test_indexes = calc_train_test_indexes_using_ratio(
-            deepcorr_dataset, train_ratio
-        )
-        flow_pairs_train, labels_train, flow_pairs_test, labels_test = (
-            generate_flow_pairs_to_memmap(
-                dataset=deepcorr_dataset, 
-                train_index=train_indexes, 
-                test_index=test_indexes, 
-                flow_size=flow_size, 
-                memmap_saving_path=memmap_dataset_path, 
-                negative_samples=negative_samples
-            )
-        )
+    # Load pregenerated dataset
+    flow_pairs_train, labels_train, flow_pairs_test, labels_test = (
+        load_pregenerated_memmap_dataset(pregenerated_dataset_path)
+    )
 
     # Doesn't seem to make any difference in speed,
     # maybe because the dataset is small.
     # Leaving it in for now.
-    if config['load_dataset_into_memory']:
+    if load_data_set_into_memory:
         flow_pairs_train, labels_train, flow_pairs_test, labels_test = [
             np.array(arr) for arr in (
                 flow_pairs_train, labels_train, flow_pairs_test, labels_test

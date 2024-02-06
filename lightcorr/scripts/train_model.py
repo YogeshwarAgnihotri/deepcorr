@@ -10,7 +10,7 @@ import time
 
 from modules.model_training import train_model
 from modules.model_validation import perform_validation
-from modules.config_utlis import init_model_training
+from modules.config_utlis import init_model_for_training
 from modules.data_handling import load_prepare_dataset, save_dataset_info
 from modules.data_processing import flatten_flow_pairs_and_label
 from modules.enviroment_setup import setup_environment
@@ -36,42 +36,53 @@ def main():
 
     config, run_folder_path = setup_environment(args)
     
-    print("\nModel type:", config['model_type'])
-    print("Selected Model Config:", 
-          config['selected_model_configs'])
+    # print("\nModel type:", config['model_type'])
+    # print("Selected Model Config:", 
+    #       config['selected_model_configs'])
 
+    load_dataset_into_memory = config['load_dataset_into_memory']
+    
     copy_file(args.config_path, os.path.join(
         run_folder_path, "used_config_train.yaml"))
+    
+    for run_name, run_settings in config['runs'].items():
+        model_type = run_settings['model_type']
+        model_config_name = run_settings['model_config_name']
+        pregenerated_dataset_path = run_settings['pregenerated_dataset_path']
+        
+        flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
+            load_prepare_dataset(pregenerated_dataset_path, 
+                                    load_dataset_into_memory)
+        
+        flattened_flow_pairs_train, flattened_labels_train = \
+            flatten_flow_pairs_and_label(flow_pairs_train, labels_train)
+        
+        model_training_parameter = (config['model_configs']
+                        [model_type]
+                        [model_config_name])
+        
+        # Model initialization
+        model = init_model_for_training(model_type, 
+                                        model_training_parameter)
+        
+        trained_model = train_model(model, 
+                                    flattened_flow_pairs_train, 
+                                    flattened_labels_train)        
 
-    flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
-        load_prepare_dataset(config, 
-                             run_folder_path)
+        perform_validation(trained_model, 
+                        flattened_flow_pairs_train, 
+                        flattened_labels_train, 
+                        config, 
+                        run_folder_path)
 
-    flattened_flow_pairs_train, flattened_labels_train = \
-        flatten_flow_pairs_and_label(flow_pairs_train, labels_train)
+    # save_model(trained_model, run_folder_path)
 
-    # Model initialization
-    model_type = config['model_type']
-    model = init_model_training(config, model_type)
-
-    trained_model = train_model(model, 
-                                flattened_flow_pairs_train, 
-                                flattened_labels_train)
-
-    perform_validation(trained_model, 
-                       flattened_flow_pairs_train, 
-                       flattened_labels_train, 
-                       config, 
-                       run_folder_path)
-
-    save_model(trained_model, run_folder_path)
-
-    save_dataset_info(config, 
-                      flow_pairs_train, 
-                      labels_train, 
-                      flow_pairs_test, 
-                      labels_test, 
-                      run_folder_path)
+    # save_dataset_info(config, 
+    #                   flow_pairs_train, 
+    #                   labels_train, 
+    #                   flow_pairs_test, 
+    #                   labels_test, 
+    #                   run_folder_path)
 
     end_time = time.time()
     print(f"\nFull training process finished in {end_time - start_time} seconds.")

@@ -1,27 +1,19 @@
 #####################Dataset loading, splitting and generating settings#####################
-load_pregenerated_dataset: True  # If true, load the dataset; otherwise, generate the dataset
-pregenerated_dataset_path: 
-  "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252_agg" 
-#pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
-
-# Dataset generation settings
-# ONLY USED IF load_pregenerated_dataset IS FALSE
-base_dataset_path: "/home/yogeshwar/datasets/deepcorr_original"  # Path to the DeepCorr dataset
-#base_dataset_path: "/home/yagnihotri/datasets/deepcorr_original"  # Path to the DeepCorr dataset
-
-train_ratio: 0.8  # Training set ratio
-flow_size: 300  # Flow sizes
-negative_samples: 1  # Number of negative samples
-load_all_data: False  # If true, load all data; otherwise, only load flows with minimum specified packets
-
 # Load dataset fully into memory, if false keeps using memmap arrays
 load_dataset_into_memory: False
 
 ######################################Run Settings###########################################
-model_type: "decision_tree"  # "decision_tree" , "random_forest", "xgbClassifier"
-selected_model_configs: 
-  "default" 
-
+#pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
+runs:
+  dt_9008_2252:
+    model_type: "decision_tree"  
+    model_config_name: "best"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252" 
+  dt_9008_2252_agg:
+    model_type: "decision_tree"  
+    model_config_name: "best"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252_agg"
+    
 run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
 #run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"
 

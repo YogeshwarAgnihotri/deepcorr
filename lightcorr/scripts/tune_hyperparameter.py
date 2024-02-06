@@ -87,9 +87,12 @@ def main():
     copy_file(args.config_path, os.path.join(
         run_folder_path, "used_config_hyperparameter_tune.yaml"))
 
+    pregenerated_dataset_path = config['pregenerated_dataset_path']
+    load_dataset_into_memory = config['load_data_set_into_memory']
+
     flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
-        load_prepare_dataset(config, 
-                             run_folder_path)
+        load_prepare_dataset(pregenerated_dataset_path, 
+                             load_dataset_into_memory)
 
     flattened_flow_pairs_train, flattened_labels_train = \
         flatten_flow_pairs_and_label(flow_pairs_train, labels_train)
