@@ -17,14 +17,12 @@ load_all_data: False  # If true, load all data; otherwise, only load flows with 
 load_dataset_into_memory: False
 
 ######################################Run Settings###########################################
-model_type: "decision_tree"  # "decision_tree" , "random_forest", "xgbClassifier"
+model_type: "random_forest"  # "decision_tree" , "random_forest", "xgbClassifier"
 run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
 #run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"
 
 hyperparameter_search_type: "none"  # Type of hyperparameter search ("none", "grid_search", "halving_grid_search" "random_search")
 selected_hyperparameter_grid: "none"  # Name of the hyperparameter grid to use (see below)
-# Selects which confinguration to use for single model training see below for details
-single_model_training_config: "none" # select one from the single training config below. 
 
 ######################################Validation Settings######################################
 validation_settings:
@@ -80,52 +78,40 @@ hyperparameter_search_settings:
 #       hyperparameter_name: [hyperparameter_values]
 #       ...
 hyperparameter_grid:
-  decision_tree:
-    extensive:
-      criterion: ["gini", "entropy"] 
-      splitter: ["best", "random"] 
-      max_depth: [null, 10, 20, 30, 40, 50, 60]
-      min_samples_split: [2, 4, 6, 8, 10] 
-      min_samples_leaf: [1, 2, 3, 4, 5]  
-      max_features: [null, "sqrt", "log2", 0.5, 0.75, 1.0]  
-      class_weight: [null, "balanced", {0: 1, 1: 2}, {0: 1, 1: 3}]  
-      min_impurity_decrease: [0.0, 0.01, 0.02, 0.05] 
-      ccp_alpha: [0.0, 0.01, 0.02, 0.05] 
+  random_forest:
     simple:
-      criterion: ["gini", "entropy"] 
-      max_depth: [null, 10, 20, 30] 
-      min_samples_split: [2, 5, 10]  
-      min_samples_leaf: [1, 2, 4]  
-
-######################################Single Model Training Settings########################
-# Single Model Training Settings (For training without hyperparameter search)
-# structure: 
-#   model_type: 
-#     config_name: 
-#       hyperparameter_name: hyperparameter_value
-#       ...
-single_model_training:
-  decision_tree:
-    default:
-      criterion: "gini"  # Function to measure the quality of a split
-      splitter: "best"  # Strategy to choose the split at each node
-      max_depth: null  # Maximum depth of the tree
-      min_samples_split: 2  # Minimum number of samples required to split an internal node
-      min_samples_leaf: 1  # Minimum number of samples required to be at a leaf node
-      min_weight_fraction_leaf: 0.0  # Minimum weighted fraction of the sum total of weights required at a leaf node
-      max_features: null  # Number of features to consider for the best split
-      random_state: null  # Controls the randomness of the estimator
-      max_leaf_nodes: null  # Maximum number of leaf nodes
-      min_impurity_decrease: 0.0  # A node will be split if the decrease in impurity is greater than this value
-      class_weight: null  # Weights associated with classes
-      ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning
-    best:
-      splitter: "best"
-      min_samples_split: 10
-      min_samples_leaf: 2
-      min_impurity_decrease: 0.0
-      max_features: 1.0
-      max_depth: 60
-      criterion: "entropy"
-      class_weight: {0: 1, 1: 2}
-      ccp_alpha: 0.0
+      n_estimators: [100, 200, 300]
+      max_depth: [null, 10, 20, 30]
+      min_samples_split: [2, 4, 6]
+      min_samples_leaf: [1, 2, 4]
+      max_features: ["sqrt", "log2", null]
+      bootstrap: [True, False]
+      class_weight: [null, "balanced"]
+      n_jobs: [-1]
+    second:
+      n_estimators: [300, 400, 500]
+      max_depth: [10, 15, 20, 25, null]
+      min_samples_split: [3, 4, 5]
+      min_samples_leaf: [2, 3, 4]
+      max_features: ["sqrt", "log2"]
+      bootstrap: [False]
+      class_weight: ["balanced"]
+      n_jobs: [-1]
+    third:
+      n_estimators: [500, 600, 1000]  # Increased upper limit
+      max_depth: [10, 40, null]  # Exploring deeper trees and no limit
+      min_samples_split: [5, 8]  # Slightly increased values
+      min_samples_leaf: [4, 7]  # Slightly increased values
+      max_features: ["sqrt", 0.3, 0.5, null]  # Including 'auto' for all features
+      bootstrap: [True, False]  # Exploring both options
+      class_weight: ["balanced"]
+      n_jobs: [-1]
+    fourth:
+      n_estimators: [1000, 2000, 3000]  # Increased upper limit
+      max_depth: [10, 60, 100, null]  # Exploring deeper trees and no limit
+      min_samples_split: [5, 10, 15]  # Slightly increased values
+      min_samples_leaf: [5, 10, 15]  # Slightly increased values
+      max_features: [0.5, 0.7, null]  # Including 'auto' for all features
+      bootstrap: [True, False]  # Exploring both options
+      class_weight: ["balanced"]
+      n_jobs: [-1]
