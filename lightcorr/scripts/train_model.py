@@ -9,13 +9,14 @@ import argparse
 import time
 
 from modules.model_training import train_model
-from modules.model_validation import perform_validation
+from modules.model_validation import perform_custom_cv
 from modules.config_utlis import init_model_for_training
 from modules.data_handling import load_prepare_dataset, save_dataset_info
 from modules.data_processing import flatten_flow_pairs_and_label
 from modules.enviroment_setup import setup_environment
 from modules.model_persistence import save_model
-from shared.utils import copy_file  
+from modules.plotting import plot_multiple_roc_curves
+from shared.utils import copy_file, save_plot_to_path
 
 def main():
     """Train a Classifier on the dataset."""
@@ -45,7 +46,13 @@ def main():
     copy_file(args.config_path, os.path.join(
         run_folder_path, "used_config_train.yaml"))
     
+    mean_res = []
+
+    #todo this is a bit ugly
+    run_names = []
+    
     for run_name, run_settings in config['runs'].items():
+        run_names.append(run_name)
         model_type = run_settings['model_type']
         model_config_name = run_settings['model_config_name']
         pregenerated_dataset_path = run_settings['pregenerated_dataset_path']
@@ -69,11 +76,23 @@ def main():
                                     flattened_flow_pairs_train, 
                                     flattened_labels_train)        
 
-        perform_validation(trained_model, 
-                        flattened_flow_pairs_train, 
-                        flattened_labels_train, 
-                        config, 
-                        run_folder_path)
+        cv_mean_res = perform_custom_cv(trained_model, 
+                                            flattened_flow_pairs_train, 
+                                            flattened_labels_train, 
+                                            cv_num=config['validation_settings']
+                                            ['cross_validation']
+                                            ['cv'], 
+                                            run_folder_path = run_folder_path)
+        
+        mean_res.append(cv_mean_res)
+
+    fig_linear, fig_log = plot_multiple_roc_curves(mean_res, run_names)
+
+    save_plot_to_path(fig=fig_linear, file_name="roc_linear_comb.png", save_path=run_folder_path)
+    save_plot_to_path(fig=fig_log, file_name="roc_log_comb.png", save_path=run_folder_path)
+
+
+    
 
     # save_model(trained_model, run_folder_path)
 
@@ -87,6 +106,7 @@ def main():
     end_time = time.time()
     print(f"\nFull training process finished in {end_time - start_time} seconds.")
 
+    
 
 if __name__ == "__main__":
     main()

@@ -15,7 +15,7 @@ from modules.model_training import (
     train_classifier_gridSearch, 
     train_classifier_randomSearch
 )
-from modules.model_validation import perform_validation
+from modules.model_validation import perform_custom_cv
 from modules.config_utlis import init_model_hyperparameter_tuning
 from modules.enviroment_setup import setup_environment
 from modules.data_handling import load_prepare_dataset, save_dataset_info
@@ -123,7 +123,7 @@ def main():
         raise ValueError("Hyperparameter search type is 'none' or not \
                          defined.")
     
-    perform_validation(best_model, 
+    perform_custom_cv(best_model, 
                        flattened_flow_pairs_train, 
                        flattened_labels_train, 
                        config, 

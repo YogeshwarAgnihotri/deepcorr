@@ -7,8 +7,8 @@ load_dataset_into_memory: False
 runs:
   dt_9008_2252:
     model_type: "decision_tree"  
-    model_config_name: "best"
-    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252" 
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/deepcorr_9008_2252_agg" 
   dt_9008_2252_agg:
     model_type: "decision_tree"  
     model_config_name: "best"
