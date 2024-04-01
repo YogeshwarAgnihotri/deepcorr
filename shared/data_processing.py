@@ -32,16 +32,16 @@ def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memm
         #Saving True Pair
         #The *1000 and /1000 for normalization? 
         # "There/here"[0] are the interpacket delays
-        l2s[index,0,:,0]=np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0
-        l2s[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
-        l2s[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
-        l2s[index,3,:,0]=np.array(dataset[i]['here'][0]['->'][:flow_size])*1000.0
+        l2s[index,0,:,0] = minimum_padding(np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+        l2s[index,1,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
+        l2s[index,2,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+        l2s[index,3,:,0] = minimum_padding(np.array(dataset[i]['here'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
 
         # "There/here"[1] are the packet sizes
-        l2s[index,4,:,0]=np.array(dataset[i]['here'][1]['<-'][:flow_size])/1000.0
-        l2s[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
-        l2s[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
-        l2s[index,7,:,0]=np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0
+        l2s[index,4,:,0] = minimum_padding(np.array(dataset[i]['here'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+        l2s[index,5,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
+        l2s[index,6,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+        l2s[index,7,:,0] = minimum_padding(np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
 
         if index % (negetive_samples+1) !=0:
             #print(index, len(nears))
@@ -61,16 +61,16 @@ def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memm
             # Here the false parring is created. The "there" flow is kept from the true parring of the for loop (for loop of train idex)
             # "Here" flow is added to the false parring from a random shuffeld idx which is not accidently the true parring.
 
-            l2s[index,0,:,0]=np.array(dataset[idx]['here'][0]['<-'][:flow_size])*1000.0
-            l2s[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
-            l2s[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
-            l2s[index,3,:,0]=np.array(dataset[idx]['here'][0]['->'][:flow_size])*1000.0
+            l2s[index,0,:,0] = minimum_padding(np.array(dataset[idx]['here'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+            l2s[index,1,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
+            l2s[index,2,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+            l2s[index,3,:,0] = minimum_padding(np.array(dataset[idx]['here'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
 
-            l2s[index,4,:,0]=np.array(dataset[idx]['here'][1]['<-'][:flow_size])/1000.0
-            l2s[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
-            l2s[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
-            l2s[index,7,:,0]=np.array(dataset[idx]['here'][1]['->'][:flow_size])/1000.0
-
+            l2s[index,4,:,0] = minimum_padding(np.array(dataset[idx]['here'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+            l2s[index,5,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
+            l2s[index,6,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+            l2s[index,7,:,0] = minimum_padding(np.array(dataset[idx]['here'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
+            
             #l2s[index,0,:,0]=Y_train[i]#np.concatenate((Y_train[i],X_train[idx]))#(Y_train[i]*X_train[idx])/(np.linalg.norm(Y_train[i])*np.linalg.norm(X_train[idx]))
             #l2s[index,1,:,0]=X_train[idx]
 
@@ -104,28 +104,30 @@ def generate_flow_pairs_to_memmap(dataset,train_index,test_index,flow_size, memm
 
             m+=1
 
-            l2s_test[index,0,:,0]=np.array(dataset[idx]['here'][0]['<-'][:flow_size])*1000.0
-            l2s_test[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
-            l2s_test[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
-            l2s_test[index,3,:,0]=np.array(dataset[idx]['here'][0]['->'][:flow_size])*1000.0
+            l2s_test[index,0,:,0] = minimum_padding(np.array(dataset[idx]['here'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+            l2s_test[index,1,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
+            l2s_test[index,2,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+            l2s_test[index,3,:,0] = minimum_padding(np.array(dataset[idx]['here'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
 
-            l2s_test[index,4,:,0]=np.array(dataset[idx]['here'][1]['<-'][:flow_size])/1000.0
-            l2s_test[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
-            l2s_test[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
-            l2s_test[index,7,:,0]=np.array(dataset[idx]['here'][1]['->'][:flow_size])/1000.0
+            l2s_test[index,4,:,0] = minimum_padding(np.array(dataset[idx]['here'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+            l2s_test[index,5,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
+            l2s_test[index,6,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+            l2s_test[index,7,:,0] = minimum_padding(np.array(dataset[idx]['here'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
+
             labels_test[index]=0
             index+=1
 
         # Everything same for testing as for training data. for details what this does see some lines above
-        l2s_test[index,0,:,0]=np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0
-        l2s_test[index,1,:,0]=np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0
-        l2s_test[index,2,:,0]=np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0
-        l2s_test[index,3,:,0]=np.array(dataset[i]['here'][0]['->'][:flow_size])*1000.0
+        l2s_test[index,0,:,0] = minimum_padding(np.array(dataset[i]['here'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+        l2s_test[index,1,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
+        l2s_test[index,2,:,0] = minimum_padding(np.array(dataset[i]['there'][0]['<-'][:flow_size])*1000.0, min_length=flow_size)
+        l2s_test[index,3,:,0] = minimum_padding(np.array(dataset[i]['here'][0]['->'][:flow_size])*1000.0, min_length=flow_size)
 
-        l2s_test[index,4,:,0]=np.array(dataset[i]['here'][1]['<-'][:flow_size])/1000.0
-        l2s_test[index,5,:,0]=np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0
-        l2s_test[index,6,:,0]=np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0
-        l2s_test[index,7,:,0]=np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0
+        l2s_test[index,4,:,0] = minimum_padding(np.array(dataset[i]['here'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+        l2s_test[index,5,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
+        l2s_test[index,6,:,0] = minimum_padding(np.array(dataset[i]['there'][1]['<-'][:flow_size])/1000.0, min_length=flow_size)
+        l2s_test[index,7,:,0] = minimum_padding(np.array(dataset[i]['here'][1]['->'][:flow_size])/1000.0, min_length=flow_size)
+        
         #l2s_test[index,2,:,0]=dataset[i]['there'][0]['->'][:flow_size]
         #l2s_test[index,3,:,0]=dataset[i]['here'][0]['<-'][:flow_size]
 

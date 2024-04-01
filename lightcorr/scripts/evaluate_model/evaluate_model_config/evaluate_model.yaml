@@ -1,0 +1,9 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  rf_best_9008_2252_flows_300:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/random_forrests/9008_true_flow_pairs/26-01-2024_23:33:01_hv_gs_rf_4/best_model_manually_retrained/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/legacy/deepcorr_9008_2252"
+  xgb_yet_best_9008_2252_flows_300:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/xgbClassifier/9008_true_flow_pairs/27-01-2024_02:00:38_Halving_grid_search_xgb_1_simple/best_model_manually_retrained/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/legacy/deepcorr_9008_2252"

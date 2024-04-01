@@ -4,7 +4,7 @@ Loading pregenerated memmap dataset...
 Training the model with random search...
 Fitting 5 folds for each of 200 candidates, totalling 1000 fits
 
-Training completed in 0d 0h 15m 26.95s
+/home/yogeshwar/master_thesis_corr/saved_runs/random_forrestsTraining completed in 0d 0h 15m 26.95s
 
 Best parameters: {'splitter': 'best', 'min_samples_split': 10, 'min_samples_leaf': 2, 'min_impurity_decrease': 0.0, 'max_features': 1.0, 'max_depth': 60, 'criterion': 'entropy', 'class_weight': {0: 1, 1: 2}, 'ccp_alpha': 0.0}
 

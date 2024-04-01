@@ -10,6 +10,42 @@ This is a collection of functions for inital data handling. Everything what is
 not related to intial stuff should be in data_processing.py
 """
 
+def load_dataset_deepcorr_specific(path_dataset, run_ids, packet_thresholds):
+    """
+    This function loads the dataset from the base pickle files. The dataset is a list of flow pairs.
+    The dataset is loaded from the given path_dataset. The dataset is loaded from the pickle files
+    that are named according to the given run_ids and packet_thresholds. The dataset is the concatenation
+    of all the datasets loaded from the pickle files. The dataset is returned as a list of flow pairs.
+    Note: packet_threshold 0 stands for any size between 0 and 299
+    """
+    print("\nLoading dataset from base pickle files...")
+        
+    dataset = []
+    paths_to_pickle_files_to_load = []
+    
+    for run_id in run_ids:
+        for threshold in packet_thresholds:
+            if threshold == "":
+                filename = f"{run_id}_tordata.pickle"  # For files without a packet threshold
+            else:
+                filename = f"{run_id}_tordata{threshold}.pickle"  # For files with a packet threshold
+            file_path = os.path.join(path_dataset, filename)
+            if os.path.exists(file_path):
+                paths_to_pickle_files_to_load.append(file_path)
+            else:
+                print(f"Warning: The file {filename} does not exist and will be skipped.")
+
+    with tqdm.tqdm(total=len(paths_to_pickle_files_to_load), desc="Loading progress") as pbar:
+        for path in paths_to_pickle_files_to_load:
+            print("Loading", path)
+            with open(path, 'rb') as file:
+                dataset += pickle.load(file)
+            pbar.update(1)
+
+    print('Dataset length/Amount of true flow pairs used: ', len(dataset))
+    return dataset
+
+
 def load_dataset_deepcorr(path_dataset, load_all_data):  
     print("\nLoading dataset from base pickle files...")
     check_path_throw_error(path_dataset)
@@ -39,7 +75,7 @@ def load_dataset_deepcorr(path_dataset, load_all_data):
             paths_to_pickle_files_to_load.extend([
                 # TODO add the padding stuff from the other script (somewhere done already) and then use this. otherwise this doesent work currently
                 # It contains about another 11.260 flow pairs (half of the full dataset)
-                #os.path.join(path_dataset, f"{name}_tordata.pickle"),
+                os.path.join(path_dataset, f"{name}_tordata.pickle"),
                 os.path.join(path_dataset, f"{name}_tordata300.pickle"),
                 os.path.join(path_dataset, f"{name}_tordata400.pickle"),
                 os.path.join(path_dataset, f"{name}_tordata500.pickle")

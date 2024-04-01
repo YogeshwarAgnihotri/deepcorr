@@ -6,7 +6,15 @@ from sklearn.metrics import RocCurveDisplay, auc, confusion_matrix, precision_re
 from shared.utils import save_plot_to_path, save_array_to_file
 
 
-def evaluate_test_set(model, training_data, labels_test, run_folder_path):
+def evaluate_test_set(model, training_data, labels_test):
+    print("\nEvaluating the model on the test set...")
+    scores = model.predict_proba(training_data)[:, 1]  # assuming the second column is for the positive class
+    fpr, tpr, thresholds = roc_curve(labels_test, scores)
+    roc_auc = auc(fpr, tpr)
+    # Now, return the metrics instead of plotting them directly
+    return fpr, tpr, roc_auc, thresholds
+
+def evaluate_test_set_old(model, training_data, labels_test, run_folder_path):
     print("\nEvaluating the model on the test set...")
     # Make predictions using predict_proba to get the probability scores
     scores = model.predict_proba(training_data)[:, 1]  # assuming the second column is for the positive class

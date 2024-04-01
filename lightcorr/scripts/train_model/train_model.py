@@ -35,7 +35,7 @@ def main():
     )
     args = parser.parse_args()
 
-    config, run_folder_path = setup_environment(args)
+    config, parent_run_folder_path = setup_environment(args)
     
     # print("\nModel type:", config['model_type'])
     # print("Selected Model Config:", 
@@ -44,7 +44,7 @@ def main():
     load_dataset_into_memory = config['load_dataset_into_memory']
     
     copy_file(args.config_path, os.path.join(
-        run_folder_path, "used_config_train.yaml"))
+        parent_run_folder_path, "used_config_train.yaml"))
     
     mean_res = []
 
@@ -52,7 +52,14 @@ def main():
     run_names = []
     
     for run_name, run_settings in config['runs'].items():
+        # Display which run this is
+        print(f"\n ---------------------------------- Training run: {run_name} -----------------------------------------")
+        
         run_names.append(run_name)
+        
+        # Create a subfolder for the run
+        sub_run_folder_path = os.path.join(parent_run_folder_path, run_name)
+
         model_type = run_settings['model_type']
         model_config_name = run_settings['model_config_name']
         pregenerated_dataset_path = run_settings['pregenerated_dataset_path']
@@ -82,14 +89,17 @@ def main():
                                             cv_num=config['validation_settings']
                                             ['cross_validation']
                                             ['cv'], 
-                                            run_folder_path = run_folder_path)
+                                            run_folder_path = sub_run_folder_path)
         
         mean_res.append(cv_mean_res)
 
+        # Save the model
+        save_model(trained_model, sub_run_folder_path)
+
     fig_linear, fig_log = plot_multiple_roc_curves(mean_res, run_names)
 
-    save_plot_to_path(fig=fig_linear, file_name="roc_linear_comb.png", save_path=run_folder_path)
-    save_plot_to_path(fig=fig_log, file_name="roc_log_comb.png", save_path=run_folder_path)
+    save_plot_to_path(fig=fig_linear, file_name="roc_linear_comb.png", save_path=parent_run_folder_path)
+    save_plot_to_path(fig=fig_log, file_name="roc_log_comb.png", save_path=parent_run_folder_path)
 
 
     
