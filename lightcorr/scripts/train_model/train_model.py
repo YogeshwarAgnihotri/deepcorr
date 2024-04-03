@@ -2,9 +2,9 @@
 import sys
 import os
 sys.path.insert(0, 
-                os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-sys.path.insert(0, 
                 os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, 
+                os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 import argparse
 import time
 
@@ -17,6 +17,28 @@ from modules.enviroment_setup import setup_environment
 from modules.model_persistence import save_model
 from modules.plotting import plot_multiple_roc_curves
 from shared.utils import copy_file, save_plot_to_path
+
+def verify_and_stop_if_invalid(config):
+    """
+    Verifies that all dataset paths in the config are valid.
+    Stops script execution and prints invalid paths if any are found.
+    
+    Parameters:
+    - config: The configuration dictionary.
+    """
+    invalid_paths = []
+    for run_name, run_settings in config['runs'].items():
+        dataset_path = run_settings.get('pregenerated_dataset_path', '')
+        if not os.path.exists(dataset_path):
+            invalid_paths.append(dataset_path)
+    
+    if invalid_paths:  # If there are any invalid paths
+        print("Invalid paths found. Please correct the following paths in your configuration:")
+        for path in invalid_paths:
+            print(f"- {path}")
+        sys.exit("Script execution stopped due to invalid paths.")
+    else:
+        print("All paths are valid.")
 
 def main():
     """Train a Classifier on the dataset."""
@@ -50,6 +72,8 @@ def main():
 
     #todo this is a bit ugly
     run_names = []
+
+    verify_and_stop_if_invalid(config)
     
     for run_name, run_settings in config['runs'].items():
         # Display which run this is
