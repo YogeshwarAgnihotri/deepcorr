@@ -1,0 +1,12 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  RF, Tun. Params, Testing Dataset Length 2094:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/varing_training_dataset_size/training_validation/02-04-2024_11:40:24_rf/best_12500/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/timing/deepcorr_total_12094_train_10000_test_2094"
+  RF, Tun. Params, Testing Dataset Length 5000:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/varing_training_dataset_size/training_validation/02-04-2024_11:40:24_rf/best_12500/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/timing/deepcorr_total_15000_train_10000_test_5000"
+  RF, Tun. Params, Testing Dataset Length 10000:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/varing_training_dataset_size/training_validation/02-04-2024_11:40:24_rf/best_12500/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/timing/deepcorr_total_20000_train_10000_test_10000"

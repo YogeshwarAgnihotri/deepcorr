@@ -1,0 +1,24 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  Decision Tree:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/dt/11-04-2024_17:09:30_dt_baseline_and_both_agg/default_agg_flow_100_train_10000_test_2500/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_both/agg_flow_100_dataset_12500"
+  
+  Random Forest:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/11-04-2024_17:24:18_rf_default_tun_baseline_and_both_agg/rf_default_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_both/agg_flow_100_dataset_23535"
+
+  XGBClassifier:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/12-04-2024_15:15:06_xgb_default_tun_baseline_and_both_agg/xgb_default_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_both/agg_flow_100_dataset_23535"
+
+additional_roc_curves:
+  - path: "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/evaluate_model/evaluate_model_config/extracted_roc_points/deepcoffea_roc_points.csv"
+    name: "DeepCoFFEA"
+  - path: "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/evaluate_model/evaluate_model_config/extracted_roc_points/deepcorr_roc_points.csv"
+    name: "DeepCorr"
+  - path: "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/evaluate_model/evaluate_model_config/extracted_roc_points/deepcorr_raptor_roc_points.csv"
+    name: "Raptor (By DeepCorr Authors)"
+  - path: "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/evaluate_model/evaluate_model_config/deepcoffea_deepcorr_calc_roc_points/deepcoffea_edited.csv"
+    name: "DeepCoFFEA Validated"

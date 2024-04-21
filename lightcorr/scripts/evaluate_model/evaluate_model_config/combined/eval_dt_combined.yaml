@@ -1,0 +1,12 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  DT, Def. Params, Flow Size 100:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/combined/training/07-04-2024_23:49:55_dt/dt_default_best_flow_100_dataset_full/model.joblib"  
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/best_dataset"
+
+additional_roc_curves:
+  - path: "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/evaluate_model/evaluate_model_config/extracted_roc_points/deepcoffea_roc_points.csv"
+    name: "DeepCoFFEA"
+  - path: "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/evaluate_model/evaluate_model_config/extracted_roc_points/deepcorr_roc_points.csv"
+    name: "DeepCorr"

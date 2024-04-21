@@ -1,0 +1,61 @@
+#####################Dataset loading, splitting and generating settings#####################
+# Load dataset fully into memory, if false keeps using memmap arrays
+load_dataset_into_memory: False
+
+######################################Run Settings###########################################
+#pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
+runs:
+  rf_best_flow_size_100_full_dataset:
+    model_type: "random_forest"  
+    model_config_name: "best"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/best_dataset"
+  
+    
+run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
+#run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"
+
+######################################Validation Settings######################################
+validation_settings:
+  run_validation: true # If true, run validation, otherwise skip validation
+  roc_plot_enabled: true  # If true, generate ROC plot
+  cross_validation:
+    cv: 5  # Number of folds for cross-validation
+    n_jobs: -1  # Number of jobs to run in parallel. -1 means using all processors
+    verbose: 100  # Verbosity level for cross-validation
+
+######################################Single Model Training Settings########################
+# structure: 
+#   model_type: 
+#     config_name: 
+#       hyperparameter_name: hyperparameter_value
+#       ...
+model_configs:
+  random_forest:
+    default:
+      n_estimators: 100  # The number of trees in the forest (alternative values could be any integer, like 10, 200, 500)
+      criterion: "gini"  # The function to measure the quality of a split (alternative values: "entropy", "log_loss")
+      max_depth: null  # The maximum depth of each tree (alternatives: any positive integer, or null for no limit)
+      min_samples_split: 2  # The minimum number of samples required to split an internal node (alternatives: any integer greater than 1, or a float for a fraction of the total number of samples)
+      min_samples_leaf: 1  # The minimum number of samples required to be at a leaf node (alternatives: any integer greater than 0, or a float for a fraction of the total number of samples)
+      min_weight_fraction_leaf: 0.0  # The minimum weighted fraction of the sum total of weights required to be at a leaf node (alternative: any float between 0.0 and 0.5)
+      max_features: "sqrt"  # The number of features to consider when looking for the best split (alternatives: "log2", null, any integer or float between (0, 1))
+      max_leaf_nodes: null  # The maximum number of leaf nodes (alternatives: any positive integer, or null for no limit)
+      min_impurity_decrease: 0.0  # A node will be split if this split induces a decrease of impurity greater than this value (alternatives: any non-negative float)
+      bootstrap: true  # Whether bootstrap samples are used when building trees (alternatives: false)
+      oob_score: false  # Whether to use out-of-bag samples to estimate the generalization score (alternatives: true, but only if bootstrap is true)
+      n_jobs: -1  # The number of jobs to run in parallel (alternatives: -1 for using all processors, or any positive integer)
+      random_state: null  # Controls the randomness of the bootstrapping and feature selection (alternatives: any integer for reproducibility)
+      verbose: 0  # Controls the verbosity when fitting and predicting (alternatives: any non-negative integer, where higher values make the process more verbose)
+      warm_start: false  # When set to true, reuse the solution of the previous call to fit and add more estimators (alternatives: true)
+      class_weight: null  # Weights associated with classes (alternatives: "balanced", "balanced_subsample", or a dict of {class_label: weight})
+      ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning (alternatives: any non-negative float)
+      max_samples: null  # If bootstrap is true, the number of samples to draw from X to train each base estimator (alternatives: any int or float between (0, 1] fraction of the total number of samples)
+    best:
+      bootstrap: True
+      class_weight: balanced
+      max_depth: 10
+      max_features: 0.7
+      min_samples_leaf: 15
+      min_samples_split: 15
+      n_estimators: 2000
+      n_jobs: -1

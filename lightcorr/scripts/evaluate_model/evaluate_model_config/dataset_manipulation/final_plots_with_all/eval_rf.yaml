@@ -1,0 +1,28 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  RF, Def. Params, Baseline:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/11-04-2024_17:24:18_rf_default_tun_baseline_and_both_agg/rf_default_23535_baseline/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline/baseline_flow_100_dataset_23535"
+  RF, Def. Params, IPDs Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/13-04-2024_19:15:40_rf_default_tun_both_individually_agg_comp/rf_default_23535_agg_ipd_packet_size_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_ipds/agg_ipds_flow_100_dataset_23535"
+  RF, Def. Params, Packet Sizes Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/13-04-2024_19:15:40_rf_default_tun_both_individually_agg_comp/rf_default_23535_agg_packet_size_ipd_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_packets/agg_packet_sizes_flow_100_dataset_23535"
+  RF, Def. Params, Both Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/11-04-2024_17:24:18_rf_default_tun_baseline_and_both_agg/rf_default_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_both/agg_flow_100_dataset_23535"
+  
+  RF, Tuned Params, Baseline:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/11-04-2024_17:24:18_rf_default_tun_baseline_and_both_agg/rf_best_23535_baseline/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline/baseline_flow_100_dataset_23535"
+  RF, Tuned Params, IPDs Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/13-04-2024_19:15:40_rf_default_tun_both_individually_agg_comp/rf_tun_23535_agg_ipd_packet_size_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_ipds/agg_ipds_flow_100_dataset_23535"
+  RF, Tuned Params, Packet Sizes Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/13-04-2024_19:15:40_rf_default_tun_both_individually_agg_comp/rf_tun_23535_agg_packet_size_ipd_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_packets/agg_packet_sizes_flow_100_dataset_23535"
+  RF, Tuned Params, Both Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/rf/11-04-2024_17:24:18_rf_default_tun_baseline_and_both_agg/rf_best_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_both/agg_flow_100_dataset_23535"

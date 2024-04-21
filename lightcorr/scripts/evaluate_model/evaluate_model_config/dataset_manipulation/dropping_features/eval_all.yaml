@@ -1,0 +1,30 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  DT, Def. Params, Both Features:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:32:14_dt_dropping_features/default_baseline_flow_100_12500/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline/baseline_flow_100_dataset_12500" 
+  DT, Def. Params, Only Packet Sizes:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:32:14_dt_dropping_features/default_ipd_dropped_flow_100_12500/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/feature_dropped/ipd_dropped_flow_100_dataset_12500"
+  DT, Def. Params, Only IPDs:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:32:14_dt_dropping_features/default_packet_sizes_dropped_flow_12500/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/feature_dropped/packet_sizes_dropped_flow_100_dataset_12500"
+  RF, Def. Params, Both Features:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:33:14_rf_dropping_features/default_baseline_flow_100_23535/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline/baseline_flow_100_dataset_23535"
+  RF, Def. Params, Only Packet Sizes:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:33:14_rf_dropping_features/default_ipd_dropped_flow_100_23535/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/feature_dropped/ipd_dropped_flow_100_dataset_23535"
+  RF, Def. Params, Only IPDs:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:33:14_rf_dropping_features/default_packet_sizes_dropped_23535/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/feature_dropped/packet_sizes_dropped_flow_100_dataset_23535"
+  XGB, Def. Params, Both Features:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:33:40_xgb_dropping_features/default_baseline_flow_100_23535/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline/baseline_flow_100_dataset_23535"
+  XGB, Def. Params, Only Packet Sizes:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:33:40_xgb_dropping_features/default_ipd_dropped_flow_100_23535/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/feature_dropped/ipd_dropped_flow_100_dataset_23535"
+  XGB, Def. Params, Only IPDs:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_4_dropping_features/training/18-04-2024_15:33:40_xgb_dropping_features/default_packet_sizes_dropped_23535/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/feature_dropped/packet_sizes_dropped_flow_100_dataset_23535"

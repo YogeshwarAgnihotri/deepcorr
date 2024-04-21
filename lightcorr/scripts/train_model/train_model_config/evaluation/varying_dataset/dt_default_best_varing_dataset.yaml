@@ -5,11 +5,19 @@ load_dataset_into_memory: False
 ######################################Run Settings###########################################
 #pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
 runs:
-  default_and_best_1000:
+  default_1000:
     model_type: "decision_tree"  
     model_config_name: "default"
     pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_1000_train_800_test_200_flowsize_300" 
-  default_and_best_23353:
+  default_6000:
+    model_type: "decision_tree"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_6000_train_4800_test_1200_flowsize_300"
+  default_12500:
+    model_type: "decision_tree"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_12500_train_10000_test_2500_flowsize_300"
+  default_23353:
     model_type: "decision_tree"  
     model_config_name: "default"
     pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_23353_train_18682_test_4671_flowsize_300"

@@ -28,9 +28,19 @@ def main():
         help='Number of negative samples to include')
     
     parser.add_argument('--aggregate_flows', action='store_true',
-        help='Aggregate flows if set')    
+        help='Aggregate flows if set') 
+    #only aggregate idps
+    parser.add_argument('--aggregate_ipds', action='store_true',
+        help='Aggregate IDPs if set')  
+    #only aggregate packet sizes
+    parser.add_argument('--aggregate_packet_sizes', action='store_true',
+        help='Aggregate packet sizes if set') 
+    
+    # add drop feature agruments, with either "ipds" or "packet_sizes" as the argument
+    parser.add_argument('--drop_feature', type=str, default=None, choices=["ipds", "packet_sizes"])
+
     parser.add_argument('--load_all_true_flow_pairs', action='store_true',
-        help='Load all data if set')
+        help='Load all data if set', default=True)
     
     parser.add_argument('--true_flow_pairs_train_ratio', type=float,
         help='Training set ratio for automatic split')
@@ -53,6 +63,23 @@ def main():
         "generation_console_output.txt"))
     sys.stdout = StreamToLogger(logger, sys.stdout)
 
+    # # check if only one aggregation type is set
+    # if args.aggregate_idps or args.aggregate_packet_sizes:
+    #     raise ValueError("Only one aggregation type can be set at a time.")
+    
+    # set mode depending on aggregation type
+    if args.aggregate_flows:
+        agg_mode = "both"
+        print(f"Aggregation mode: {agg_mode}")
+    if args.aggregate_ipds:
+        agg_mode = "ipds"
+        print(f"Aggregation mode: {agg_mode}")
+    if args.aggregate_packet_sizes:
+        agg_mode = "packet_sizes"
+        print(f"Aggregation mode: {agg_mode}")
+    else:
+        agg_mode = "none"
+
     deepcorr_dataset = load_dataset_deepcorr(args.dataset_path,
         args.load_all_true_flow_pairs)
 
@@ -69,18 +96,13 @@ def main():
         train_indexes, test_indexes = calc_train_test_indexes_using_ratio(
             deepcorr_dataset, args.true_flow_pairs_train_ratio)
 
-    if args.aggregate_flows:
-        # Aggregate the flows
-        flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
-            generate_aggregate_flow_pairs_to_memmap(deepcorr_dataset,
-                train_indexes, test_indexes, args.flow_size,
-                args.save_directory, args.negative_samples)
-    else:
-        flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
-            generate_flow_pairs_to_memmap(deepcorr_dataset, train_indexes,
-                test_indexes, args.flow_size, args.save_directory,
-                args.negative_samples)
+    # Aggregate the flows
+    flow_pairs_train, labels_train, flow_pairs_test, labels_test = \
+        generate_aggregate_flow_pairs_to_memmap(deepcorr_dataset,
+            train_indexes, test_indexes, args.flow_size,
+            args.save_directory, args.negative_samples, agg_mode, args.drop_feature)
 
+    
     # Save args to a file in the save directory
     args_file_path = os.path.join(args.save_directory, 'script_args.txt')
     save_args_to_file(args, args_file_path)

@@ -5,22 +5,40 @@ load_dataset_into_memory: False
 ######################################Run Settings###########################################
 #pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
 runs:
-  default_1000:
+  rf_default_flow_size_100:
     model_type: "random_forest"  
     model_config_name: "default"
-    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_1000_train_800_test_200_flowsize_300" 
-  default_12500:
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_100"
+  rf_default_flow_size_200:
     model_type: "random_forest"  
     model_config_name: "default"
-    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_12500_train_10000_test_2500_flowsize_300"
-  best_1000:
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_200"
+  rf_default_flow_size_300:
+    model_type: "random_forest"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_300"
+  rf_default_flow_size_450:
+    model_type: "random_forest"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_450"
+  
+  rf_best_flow_size_100:
     model_type: "random_forest"  
     model_config_name: "best"
-    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_1000_train_800_test_200_flowsize_300"
-  best_12500:
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_100"
+  rf_best_flow_size_200:
     model_type: "random_forest"  
     model_config_name: "best"
-    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_dataset_length/deepcorr_total_12500_train_10000_test_2500_flowsize_300"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_200"
+  rf_best_flow_size_300:
+    model_type: "random_forest"  
+    model_config_name: "best"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_300"
+  rf_best_flow_size_450:
+    model_type: "random_forest"  
+    model_config_name: "best"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_450"
+  
     
 run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
 #run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"

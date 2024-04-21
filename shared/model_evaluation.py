@@ -9,24 +9,27 @@ from shared.utils import save_plot_to_path, save_array_to_file
 def evaluate_test_set(model, training_data, labels_test):
     print("\nEvaluating the model on the test set...")
     scores = model.predict_proba(training_data)[:, 1]  # assuming the second column is for the positive class
+    print("Predict_proba output", model.predict_proba(training_data))
+    print("Predicted scores", scores)
+    print("Scores", scores)
     fpr, tpr, thresholds = roc_curve(labels_test, scores)
     roc_auc = auc(fpr, tpr)
     # Now, return the metrics instead of plotting them directly
     return fpr, tpr, roc_auc, thresholds
 
-def evaluate_test_set_old(model, training_data, labels_test, run_folder_path):
-    print("\nEvaluating the model on the test set...")
-    # Make predictions using predict_proba to get the probability scores
-    scores = model.predict_proba(training_data)[:, 1]  # assuming the second column is for the positive class
-    evaluate_model_print_metrics(true_labels=labels_test, predicted_labels=(scores > 0.5).astype(int))
-    fig_linear, fig_roc = calc_roc_curves(true_labels=labels_test, 
-                                          predicted_scores=scores,
-                                          run_folder_path=run_folder_path)
+# def evaluate_test_set_old(model, training_data, labels_test, run_folder_path):
+#     print("\nEvaluating the model on the test set...")
+#     # Make predictions using predict_proba to get the probability scores
+#     scores = model.predict_proba(training_data)[:, 1]  # assuming the second column is for the positive class
+#     evaluate_model_print_metrics(true_labels=labels_test, predicted_labels=(scores > 0.5).astype(int))
+#     fig_linear, fig_roc = calc_roc_curves(true_labels=labels_test, 
+#                                           predicted_scores=scores,
+#                                           run_folder_path=run_folder_path)
 
 
-    # Save the ROC curves to the run folder
-    save_plot_to_path(fig_linear, "eval_roc_curve_linear.png", run_folder_path)
-    save_plot_to_path(fig_roc, "eval_roc_curve_log.png", run_folder_path)
+#     # Save the ROC curves to the run folder
+#     save_plot_to_path(fig_linear, "eval_roc_curve_linear.png", run_folder_path)
+#     save_plot_to_path(fig_roc, "eval_roc_curve_log.png", run_folder_path)
 
     
 def evaluate_model_print_metrics(true_labels, predicted_labels):

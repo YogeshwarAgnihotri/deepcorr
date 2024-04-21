@@ -1,0 +1,15 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  DT, Def. Params, Flow Size 100:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/varing_flow_size/training_validation/03-04-2024_14:06:51_dt/dt_default_flow_size_100/model.joblib"  
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_100"
+  DT, Def. Params, Flow Size 200:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/varing_flow_size/training_validation/03-04-2024_14:06:51_dt/dt_default_flow_size_200/model.joblib"  
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_200"
+  DT, Def. Params, Flow Size 300:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/varing_flow_size/training_validation/03-04-2024_14:06:51_dt/dt_default_flow_size_300/model.joblib"  
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_300"
+  DT, Def. Params, Flow Size 450:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_2_model_performance_on_base_dataset/varing_flow_size/training_validation/03-04-2024_14:06:51_dt/dt_default_flow_size_450/model.joblib"  
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/varing_flow_length/deepcorr_total_12500_train_10000_test_2500_flowsize_450"

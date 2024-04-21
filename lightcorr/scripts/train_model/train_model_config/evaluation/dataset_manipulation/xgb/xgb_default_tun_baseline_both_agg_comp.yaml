@@ -1,0 +1,71 @@
+#####################Dataset loading, splitting and generating settings#####################
+# Load dataset fully into memory, if false keeps using memmap arrays
+load_dataset_into_memory: False
+
+######################################Run Settings###########################################
+#pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
+runs:
+  xgb_default_23535_baseline:
+    model_type: "xgbClassifier"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline_flow_100_dataset_23535"
+  xgb_tun_23535_baseline:
+    model_type: "xgbClassifier"  
+    model_config_name: "best"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline_flow_100_dataset_23535"
+  xgb_default_23535_agg:
+    model_type: "xgbClassifier"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_flow_100_dataset_23535"
+  xgb_tun_23535_agg:
+    model_type: "xgbClassifier"  
+    model_config_name: "best"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_flow_100_dataset_23535"
+    
+run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
+#run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"
+
+######################################Validation Settings######################################
+validation_settings:
+  run_validation: true # If true, run validation, otherwise skip validation
+  roc_plot_enabled: true  # If true, generate ROC plot
+  cross_validation:
+    cv: 5  # Number of folds for cross-validation
+    n_jobs: -1  # Number of jobs to run in parallel. -1 means using all processors
+    verbose: 100  # Verbosity level for cross-validation
+
+######################################Single Model Training Settings########################
+# structure: 
+#   model_type: 
+#     config_name: 
+#       hyperparameter_name: hyperparameter_value
+#       ...
+model_configs:
+  xgbClassifier:
+    default:
+      booster: "gbtree"  # Type of booster (alternatives: "gblinear" or "dart")
+      eta: 0.3  # Learning rate (alternatives: any float value, typically between 0 and 1)
+      gamma: 0  # Minimum loss reduction required to make a further partition (alternatives: any non-negative float)
+      max_depth: 6  # Maximum depth of a tree (alternatives: any positive integer)
+      min_child_weight: 1  # Minimum sum of instance weight (hessian) needed in a child (alternatives: any non-negative integer)
+      max_delta_step: 0  # Maximum delta step we allow each leaf output (alternatives: any non-negative integer)
+      subsample: 1  # Subsample ratio of the training instances (alternatives: any float between 0 and 1)
+      colsample_bytree: 1  # Subsample ratio of columns when constructing each tree (alternatives: any float between 0 and 1)
+      colsample_bylevel: 1  # Subsample ratio of columns for each level (alternatives: any float between 0 and 1)
+      colsample_bynode: 1  # Subsample ratio of columns for each split (alternatives: any float between 0 and 1)
+      lambda: 1  # L2 regularization term on weights (alternatives: any non-negative float)
+      alpha: 0  # L1 regularization term on weights (alternatives: any non-negative float)
+      tree_method: "auto"  # The tree construction algorithm (alternatives: "exact", "approx", "hist", "gpu_hist")
+      scale_pos_weight: 1  # Balancing of positive and negative weights (alternatives: any positive float)
+      objective: "binary:logistic"  # Learning task and the corresponding learning objective (alternatives: "multi:softmax", "reg:squarederror", etc.)
+      eval_metric: "error"  # Evaluation metric for validation data (alternatives: "logloss", "auc", "rmse", etc.)
+      seed: null  # Random number seed (alternatives: any integer)
+      n_jobs: -1  # Number of parallel threads (alternatives: -1 for using all processors, or any positive integer)
+      verbosity: 1  # Verbosity of printing messages (alternatives: 0 (silent), 1 (warning), 2 (info), 3 (debug))
+    best:
+      colsample_bytree: 0.7
+      learning_rate: 0.1
+      max_depth: 3
+      n_estimators: 1000
+      n_jobs: null
+      subsample: 0.9

@@ -1,0 +1,6 @@
+deepcorr:
+    dataset size 10.000 flows (50/50 split)
+    flow size 300
+
+deepcoffea:
+    

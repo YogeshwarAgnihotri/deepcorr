@@ -26,9 +26,9 @@ def main():
     start_time = time.time()
     
     config_files = [
-        "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/train_model/train_model_config/varing_flow_sizes/dt_default_varing_flow_sizes.yaml",
-        "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/train_model/train_model_config/varing_flow_sizes/rf_default_best_varing_flow_sizes.yaml",
-        "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/train_model/train_model_config/varing_dataset/xgb_default_best_varing_flow_sizes.yaml"
+        "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/train_model/train_model_config/evaluation/feature_dropped/dt.yaml",
+        "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/train_model/train_model_config/evaluation/feature_dropped/rf.yaml",
+        "/home/yogeshwar/master_thesis_corr/lightcorr/scripts/train_model/train_model_config/evaluation/feature_dropped/xgb.yaml",
     ]
 
     for config_file in config_files:

@@ -183,30 +183,77 @@ def flatten_generated_flow_pairs(*arrays):
     flattened_arrays = [array.reshape(array.shape[0], -1) for array in arrays]
     return flattened_arrays
 
-def aggregate_features(data):
+#old
+# def aggregate_features(data):
+#     """
+#     Aggregate the input data by computing the mean, standard deviation, and variance
+#     for each channel across the packet sizes/timing values.
+    
+#     Args:
+#     - data: Input data with shape [18016, 8, 300, 1].
+    
+#     Returns:
+#     - aggregated_data: Output data with shape [18016, 8, 3, 1], where each channel now has
+#       mean, standard deviation, and variance as the features.
+#     """
+#     # Compute mean, std, and variance across the third axis (packet sizes/timing values)
+#     mean = np.mean(data, axis=2, keepdims=True)  # Shape: [18016, 8, 1, 1]
+#     std = np.std(data, axis=2, keepdims=True)    # Shape: [18016, 8, 1, 1]
+#     variance = np.var(data, axis=2, keepdims=True)  # Shape: [18016, 8, 1, 1]
+    
+#     # Concatenate the computed statistics along the third axis to form a single array
+#     # Correctly concatenating to get shape [18016, 8, 3, 1]
+#     aggregated_data = np.concatenate([mean, std, variance], axis=2)  # Corrected step
+    
+#     return aggregated_data
+
+def aggregate_features(data, mode):
     """
     Aggregate the input data by computing the mean, standard deviation, and variance
-    for each channel across the packet sizes/timing values.
+    for selected channels across the packet sizes/timing values, while padding the aggregated
+    channels to match the feature size of the unchanged channels.
     
     Args:
     - data: Input data with shape [18016, 8, 300, 1].
+    - mode: A string that can be 'both', 'ipd', or 'packet_sizes' to determine which channels
+      to include in the aggregation.
     
     Returns:
-    - aggregated_data: Output data with shape [18016, 8, 3, 1], where each channel now has
-      mean, standard deviation, and variance as the features.
+    - aggregated_data: Output data with shape [18016, 8, 300, 1], with padded aggregated data
+      where necessary.
     """
-    # Compute mean, std, and variance across the third axis (packet sizes/timing values)
-    mean = np.mean(data, axis=2, keepdims=True)  # Shape: [18016, 8, 1, 1]
-    std = np.std(data, axis=2, keepdims=True)    # Shape: [18016, 8, 1, 1]
-    variance = np.var(data, axis=2, keepdims=True)  # Shape: [18016, 8, 1, 1]
+    original_feature_size = data.shape[2]  # Typically 300
+
+    if mode == 'ipds':
+        channels_to_aggregate = data[:, :4, :, :]
+        channels_unchanged = data[:, 4:, :, :]
+    elif mode == 'packet_sizes':
+        channels_to_aggregate = data[:, 4:, :, :]
+        channels_unchanged = data[:, :4, :, :]
+    else:
+        return data  # If mode is 'both', all data remains unchanged (original features per channel)
+
+    # Compute mean, std, and variance for the selected channels
+    mean = np.mean(channels_to_aggregate, axis=2, keepdims=True)
+    std = np.std(channels_to_aggregate, axis=2, keepdims=True)
+    variance = np.var(channels_to_aggregate, axis=2, keepdims=True)
     
-    # Concatenate the computed statistics along the third axis to form a single array
-    # Correctly concatenating to get shape [18016, 8, 3, 1]
-    aggregated_data = np.concatenate([mean, std, variance], axis=2)  # Corrected step
-    
+    # Concatenate the computed statistics along the third axis to form aggregated channels
+    aggregated_channels = np.concatenate([mean, std, variance], axis=2)  # Shape: [18016, 4, 3, 1]
+
+    # Pad aggregated channels to match original feature size
+    padding_size = original_feature_size - aggregated_channels.shape[2]
+    padded_aggregated_channels = np.pad(aggregated_channels, ((0,0), (0,0), (0, padding_size), (0,0)), 'constant')
+
+    # Combine the padded aggregated channels back with the unchanged channels
+    if mode == 'ipds':
+        aggregated_data = np.concatenate([padded_aggregated_channels, channels_unchanged], axis=1)
+    elif mode == 'packet_sizes':
+        aggregated_data = np.concatenate([channels_unchanged, padded_aggregated_channels], axis=1)
+
     return aggregated_data
 
-def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, flow_size, memmap_saving_path, negative_samples):
+def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, flow_size, memmap_saving_path, negative_samples, agg_mode, drop_feature):
     """
     Wrapper function that generates flow pairs, performs feature aggregation on the generated data,
     and returns the aggregated data as memmap arrays.
@@ -223,6 +270,41 @@ def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, fl
                                                                        memmap_saving_path, 
                                                                        negative_samples)
     
+    print("Shape of l2s before dropping feature:", l2s.shape)
+    print("Shape of l2s_test before dropping feature:", l2s_test.shape)
+
+    # Determine the new shapes based on the feature to drop
+    new_shape = None
+    if drop_feature is not None:
+        if drop_feature == "ipds":
+            new_shape = l2s.shape[1] - 4
+        elif drop_feature == "packet_sizes":
+            new_shape = 4
+        else:
+            raise ValueError("Invalid feature to drop. Must be 'ipds' or 'packet_sizes'.")
+
+        # Path for the new memmap files
+        new_l2s_path = os.path.join(memmap_saving_path, 'adjusted_l2s.dat')
+        new_l2s_test_path = os.path.join(memmap_saving_path, 'adjusted_l2s_test.dat')
+
+        # Create new memmap arrays with the adjusted dimensions
+        adjusted_l2s = np.memmap(new_l2s_path, dtype=np.float32, mode='w+', shape=(l2s.shape[0], new_shape, l2s.shape[2], l2s.shape[3]))
+        adjusted_l2s_test = np.memmap(new_l2s_test_path, dtype=np.float32, mode='w+', shape=(l2s_test.shape[0], new_shape, l2s_test.shape[2], l2s_test.shape[3]))
+
+        # Copy the data from the original memmap arrays to the new ones
+        if drop_feature == "ipds":
+            adjusted_l2s[:] = l2s[:, 4:, :, :]
+            adjusted_l2s_test[:] = l2s_test[:, 4:, :, :]
+        elif drop_feature == "packet_sizes":
+            adjusted_l2s[:] = l2s[:, :4, :, :]
+            adjusted_l2s_test[:] = l2s_test[:, :4, :, :]
+        
+        # Replace old memmap variables with the new ones
+        l2s, l2s_test = adjusted_l2s, adjusted_l2s_test
+    
+    print("Shape of l2s after dropping feature:", l2s.shape)
+    print("Shape of l2s_test after dropping feature:", l2s_test.shape)
+    
     # Define paths for the aggregated features
     aggregated_paths = {
         'train': os.path.join(memmap_saving_path, 'training_flow_pairs'),
@@ -231,10 +313,10 @@ def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, fl
     
     print("\nAggregating features of training data...")
     # Step 2: Perform feature aggregation
-    aggregated_train = aggregate_features(l2s)
+    aggregated_train = aggregate_features(l2s,agg_mode)
 
     print("\nAggregating features of testing data...")
-    aggregated_test = aggregate_features(l2s_test)
+    aggregated_test = aggregate_features(l2s_test,agg_mode)
     
     print("\nSaving aggregated feature data to disk...")
     # Optionally, save the aggregated features to disk as memmap arrays and then load them
@@ -250,6 +332,8 @@ def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, fl
         # Load the memmap to return
         aggregated_memmaps[key] = np.memmap(aggregated_path, dtype=dtype, mode='r', shape=shape)
 
+    print("Processing complete.")
+
     save_array_to_file(array=aggregated_memmaps['train'], file_name='training_flow_pairs.txt', save_path=memmap_saving_path)
     save_array_to_file(array=labels, file_name='training_labels.txt', save_path=memmap_saving_path)
 
@@ -258,6 +342,7 @@ def generate_aggregate_flow_pairs_to_memmap(dataset, train_index, test_index, fl
 
     # Return memmap arrays for aggregated data along with labels
     return aggregated_memmaps['train'], labels, aggregated_memmaps['test'], labels_test
+
 
 def minimum_padding(np_array, min_length):
     """

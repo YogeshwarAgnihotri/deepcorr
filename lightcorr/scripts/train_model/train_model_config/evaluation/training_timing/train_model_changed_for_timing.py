@@ -2,9 +2,9 @@
 import sys
 import os
 sys.path.insert(0, 
-                os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+                os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../..')))
 sys.path.insert(0, 
-                os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+                os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../..')))
 import argparse
 import time
 
@@ -83,7 +83,6 @@ def main():
         
         # Create a subfolder for the run
         sub_run_folder_path = os.path.join(parent_run_folder_path, run_name)
-        os.makedirs(sub_run_folder_path, exist_ok=True)
 
         model_type = run_settings['model_type']
         model_config_name = run_settings['model_config_name']
@@ -104,28 +103,28 @@ def main():
         model = init_model_for_training(model_type, 
                                         model_training_parameter)
         
+        
         trained_model = train_model(model, 
                                     flattened_flow_pairs_train, 
                                     flattened_labels_train)        
 
-        if(config['validation_settings']['run_validation'] == True):
-            cv_mean_res = perform_custom_cv(trained_model, 
-                                                flattened_flow_pairs_train, 
-                                                flattened_labels_train, 
-                                                cv_num=config['validation_settings']
-                                                ['cross_validation']
-                                                ['cv'], 
-                                                run_folder_path = sub_run_folder_path)
+        # cv_mean_res = perform_custom_cv(trained_model, 
+        #                                     flattened_flow_pairs_train, 
+        #                                     flattened_labels_train, 
+        #                                     cv_num=config['validation_settings']
+        #                                     ['cross_validation']
+        #                                     ['cv'], 
+        #                                     run_folder_path = sub_run_folder_path)
         
-            mean_res.append(cv_mean_res)
+        # mean_res.append(cv_mean_res)
 
-        # Save the model
-        save_model(trained_model, sub_run_folder_path)
+        # # Save the model
+        # save_model(trained_model, sub_run_folder_path)
 
-    fig_linear, fig_log = plot_multiple_roc_curves(mean_res, run_names)
+    # fig_linear, fig_log = plot_multiple_roc_curves(mean_res, run_names)
 
-    save_plot_to_path(fig=fig_linear, file_name="roc_linear_comb.png", save_path=parent_run_folder_path)
-    save_plot_to_path(fig=fig_log, file_name="roc_log_comb.png", save_path=parent_run_folder_path)
+    # save_plot_to_path(fig=fig_linear, file_name="roc_linear_comb.png", save_path=parent_run_folder_path)
+    # save_plot_to_path(fig=fig_log, file_name="roc_log_comb.png", save_path=parent_run_folder_path)
 
 
     # save_model(trained_model, run_folder_path)

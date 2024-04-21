@@ -1,0 +1,15 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  XGB, Def. Params, Baseline Dataset:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/12-04-2024_15:15:06_xgb_default_best/xgb_default_23535_baseline/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline_flow_100_dataset_23535"
+  XGB, Def. Params, Agg. Dataset:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/12-04-2024_15:15:06_xgb_default_best/xgb_default_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_flow_100_dataset_23535"
+  XGB, Tun. Params, Baseline Dataset:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/12-04-2024_15:15:06_xgb_default_best/xgb_tun_23535_baseline/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline_flow_100_dataset_23535"
+  XGB, Tun. Params, Agg. Dataset:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/12-04-2024_15:15:06_xgb_default_best/xgb_tun_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_flow_100_dataset_23535"

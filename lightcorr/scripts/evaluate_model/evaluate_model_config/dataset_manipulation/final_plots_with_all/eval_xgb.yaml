@@ -1,0 +1,28 @@
+parent_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr/runs/"
+
+evaluations:
+  XGB, Def. Params, Baseline:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/12-04-2024_15:15:06_xgb_default_tun_baseline_and_both_agg/xgb_default_23535_baseline/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline/baseline_flow_100_dataset_23535"
+  XGB, Def. Params, IPDs Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/13-04-2024_19:10:48_xgb_agg_ips_packet_sizes_agg_indivdually/xgb_default_23535_agg_ipd_packet_size_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_ipds/agg_ipds_flow_100_dataset_23535"
+  XGB, Def. Params, Packet Sizes Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/13-04-2024_19:10:48_xgb_agg_ips_packet_sizes_agg_indivdually/xgb_default_23535_agg_packet_size_ipd_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_packets/agg_packet_sizes_flow_100_dataset_23535"
+  XGB, Def. Params, Both Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/12-04-2024_15:15:06_xgb_default_tun_baseline_and_both_agg/xgb_default_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_both/agg_flow_100_dataset_23535"
+  
+  XGB, Tuned Params, Baseline:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/12-04-2024_15:15:06_xgb_default_tun_baseline_and_both_agg/xgb_tun_23535_baseline/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/baseline/baseline_flow_100_dataset_23535"
+  XGB, Tuned Params, IPDs Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/13-04-2024_19:10:48_xgb_agg_ips_packet_sizes_agg_indivdually/xgb_tun_23535_agg_ipd_packet_size_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_ipds/agg_ipds_flow_100_dataset_23535"
+  XGB, Tuned Params, Packet Sizes Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/13-04-2024_19:10:48_xgb_agg_ips_packet_sizes_agg_indivdually/xgb_tun_23535_agg_packet_size_ipd_normal_flow_100/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_packets/agg_packet_sizes_flow_100_dataset_23535"
+  XGB, Tuned Params, Both Agg.:
+    model_path: "/home/yogeshwar/master_thesis_corr/saved_runs/evaluation/5_3_dataset_aggregation/training/xgb/12-04-2024_15:15:06_xgb_default_tun_baseline_and_both_agg/xgb_tun_23535_agg/model.joblib"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_both/agg_flow_100_dataset_23535"

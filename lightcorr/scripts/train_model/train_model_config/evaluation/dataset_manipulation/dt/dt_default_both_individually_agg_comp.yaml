@@ -1,0 +1,49 @@
+#####################Dataset loading, splitting and generating settings#####################
+# Load dataset fully into memory, if false keeps using memmap arrays
+load_dataset_into_memory: False
+
+######################################Run Settings###########################################
+#pregenerated_dataset_path: "/home/yagnihotri/datasets/deepcorr/deepcorr_pregen/deepcorr_9008_2252"  # Path to the preprocessed dataset
+runs:
+  dt_agg_ipd_packet_size_normal_flow_100:
+    model_type: "decision_tree"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_ipd/agg_ipds_flow_100_dataset_12500" 
+  dt_agg_packet_size_ipd_normal_flow_100:
+    model_type: "decision_tree"  
+    model_config_name: "default"
+    pregenerated_dataset_path: "/home/yogeshwar/datasets/deepcorr_pregen/evaluation/dataset_manipulation/agg_packets/agg_packet_sizes_flow_100_dataset_12500"
+    
+run_folder_path: "/home/yogeshwar/master_thesis_corr/lightcorr"  # Path to the folder where the run folder will be created
+#run_folder_path: "/home/yagnihotri/projects/corr/lightcorr"
+
+######################################Validation Settings######################################
+validation_settings:
+  run_validation: true # If true, run validation, otherwise skip validation
+  roc_plot_enabled: true  # If true, generate ROC plot
+  cross_validation:
+    cv: 5  # Number of folds for cross-validation
+    n_jobs: -1  # Number of jobs to run in parallel. -1 means using all processors
+    verbose: 100  # Verbosity level for cross-validation
+
+######################################Single Model Training Settings########################
+# structure: 
+#   model_type: 
+#     config_name: 
+#       hyperparameter_name: hyperparameter_value
+#       ...
+model_configs:
+  decision_tree:
+    default:
+      criterion: "gini"  # Function to measure the quality of a split
+      splitter: "best"  # Strategy to choose the split at each node
+      max_depth: null  # Maximum depth of the tree
+      min_samples_split: 2  # Minimum number of samples required to split an internal node
+      min_samples_leaf: 1  # Minimum number of samples required to be at a leaf node
+      min_weight_fraction_leaf: 0.0  # Minimum weighted fraction of the sum total of weights required at a leaf node
+      max_features: null  # Number of features to consider for the best split
+      random_state: null  # Controls the randomness of the estimator
+      max_leaf_nodes: null  # Maximum number of leaf nodes
+      min_impurity_decrease: 0.0  # A node will be split if the decrease in impurity is greater than this value
+      class_weight: null  # Weights associated with classes
+      ccp_alpha: 0.0  # Complexity parameter used for Minimal Cost-Complexity Pruning
