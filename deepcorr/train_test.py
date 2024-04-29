@@ -7,7 +7,7 @@ import os
 
 from shared.utils import create_path
 
-
+# test
 # with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
 # with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
 #saver = tf.train.Saver()
