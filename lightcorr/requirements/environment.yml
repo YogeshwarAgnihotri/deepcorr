@@ -1,4 +1,4 @@
-name: treecorr
+name: lightcorr
 channels:
   - conda-forge
   - defaults
