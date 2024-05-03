@@ -7,7 +7,6 @@ import os
 
 from shared.utils import create_path
 
-# test
 # with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
 # with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
 #saver = tf.train.Saver()
@@ -15,24 +14,45 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
     print("Starting training...")
     log_path = os.path.join(run_folder_path, "logs/tf_log/noise_classifier/allcir_300_", str(datetime.datetime.now()))
     writer = tf.summary.FileWriter(log_path, graph=graph)
+
+    # Initialize a variable to store the best accuracy
+    best_accuracy = 0.0
     
     with tf.Session(graph=graph) as session:
     # We must initialize all variables before we use them.
         session.run(init)
 
         #TODO Check before running that everything is the same as the origial
-        temp_path = os.join(run_folder_path, "temp")
+        temp_path = os.path.join(run_folder_path, "temp")
 
         for epoch in range(num_epochs):
             l2s, labels, l2s_test, labels_test = data_processing.generate_flow_pairs_to_memmap(dataset=dataset, train_index=train_index, test_index=test_index, flow_size=flow_size, memmap_saving_path=temp_path, negetive_samples=negetive_samples)
 
-            # needs to be done since we have one positive and then 199 negative samples. needs to be shuffled   
-            # dont shuffle the l2s_test and labels_test since we want to keep the order of the test_index since need to know which groups belong together (1 group = 1 true flow pair and N_neg false flow pairs)         
-            rr= list(range(len(l2s)))
-            print("l2s size: ", len(l2s))
-            np.random.shuffle(rr)
-            l2s = l2s[rr]
-            labels = labels[rr]
+            # # needs to be done since we have one positive and then 199 negative samples. needs to be shuffled   
+            # # dont shuffle the l2s_test and labels_test since we want to keep the order of the test_index since need to know which groups belong together (1 group = 1 true flow pair and N_neg false flow pairs)         
+            # rr= list(range(len(l2s)))
+            # print("l2s size: ", len(l2s))
+            # np.random.shuffle(rr)
+            # l2s = l2s[rr]
+            # labels = labels[rr]
+
+            # Generate a full array of indices
+            indices = np.arange(len(l2s))
+
+            # Shuffle the full indices array
+            np.random.shuffle(indices)
+
+            # Shuffle l2s and labels directly using the shuffled indices, processed in batches
+            batch_size_shuffling = 256  # Adjust batch size for shuffling based on your system's memory capacity
+            for i in range(0, len(indices), batch_size_shuffling):
+                end_index = min(i + batch_size_shuffling, len(indices))
+                # Use advanced indexing to rearrange the elements directly
+                l2s[i:end_index], l2s[indices[i:end_index]] = l2s[indices[i:end_index]].copy(), l2s[i:end_index].copy()
+                labels[i:end_index], labels[indices[i:end_index]] = labels[indices[i:end_index]].copy(), labels[i:end_index].copy()
+
+            print("l2s and labels have been shuffled directly in-place.")
+
+            print("l2s and labels have been shuffled and rearranged in batches successfully.")
 
             average_loss = 0
             new_epoch=True
@@ -112,7 +132,8 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                     print("True Positive: ", tp)
                     print("False Positive: ", fp)
                     # acc is the formula for precision. this seens not to be the accuracy but the precision. Furthermore this is also not the accuracy from the paper
-                    acc= float(tp)/float(tp+fp)
+                    accuracy= float(tp)/float(tp+fp)
+                    
                     if float(tp)/float(tp+fp)>0.8:      
                         print('saving...')
                         model_saving_path = os.path.join(run_folder_path, "saved_models")
@@ -120,6 +141,16 @@ def train_model(num_epochs, dataset, train_index, test_index, flow_size, negetiv
                         # TODO i think step here should be (epoch*num_steps) +step
                         save_path = saver.save(session, os.path.join(model_saving_path, "tor_199_epoch%d_step%d_acc%.2f.ckpt"%(epoch,step,acc)))
                         print('saved')
+
+                    # Inside your validation check
+                    if accuracy > best_accuracy:
+                        print('Improved accuracy from %.2f to %.2f. Saving model...' % (best_accuracy, accuracy))
+                        best_accuracy = accuracy
+                        model_saving_path = os.path.join(run_folder_path, "saved_models")
+                        create_path(model_saving_path)
+                        save_path = saver.save(session, os.path.join(model_saving_path, "model_epoch{}_step{}_acc{:.2f}.ckpt".format(epoch, step, accuracy)))
+                        print('Model saved at: {}'.format(save_path))
+
             print('Epoch',epoch)
             #save_path = saver.save(session, "/mnt/nfs/scratch1/milad/model_diff_large_1e4_epoch%d.ckpt"%(epoch))
 
