@@ -9,15 +9,15 @@ from shared.utils import create_path
 
 from shared.train_test_split import calc_train_test_indexes_using_ratio, save_test_indexes_to_path
 from model import build_graph_testing, build_graph_training
-from train_test import train_model
+from train_test import train_model, test_model
 
 ############## PARAMETERS FOR BOTH ##############
 gpu_device = 0
 training = True
-path_dataset = "/home/yagnihotri/datasets/deepcorr_original_dataset"
+path_dataset = "/home/yagnihotri/datasets/deepcorr/deepcorr_original"
 
 ############## PARAMETERS TRAINING ##############
-load_only_flows_with_min_300 = True
+load_all_data = True
 
 negative_samples = 199
 flow_size = 300
@@ -30,7 +30,7 @@ learn_rate = 0.0001
 # paths
 path_for_saving_run = "/home/yagnihotri/projects/corr/deepcorr/runs"
 # TODO Change run_name to something shorter up sometime. maybe with config files that show the full parameters
-run_name = f"Date_{datetime.datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}__NegativeSamples_{negative_samples}_FlowSize_{flow_size}_NumEpochs_{num_epochs}_LoadOnlyFlowsWithMin300_{load_only_flows_with_min_300}_TrainRatio_{train_ratio}"
+run_name = f"Date_{datetime.datetime.now().strftime('%d-%m-%Y_%H:%M:%S')}__NegativeSamples_{negative_samples}_FlowSize_{flow_size}_NumEpochs_{num_epochs}_LoadOnlyFlowsWithMin300_{load_all_data}_TrainRatio_{train_ratio}"
 run_folder_path = os.path.join(path_for_saving_run, run_name)
 create_path(run_folder_path)
 
@@ -41,7 +41,7 @@ path_of_saved_run = "/home/yagnihotri/projects/deepcorr/runs/Date_06-12-2023_19:
 ############## CODE ##############
 os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_device)
 
-dataset = load_dataset_deepcorr(path_dataset=path_dataset, load_only_min_300_flows = load_only_flows_with_min_300)
+dataset = load_dataset_deepcorr(path_dataset=path_dataset, load_all_data= load_all_data)
 #for testing code load only small dataset
 #dataset = pickle.load(open('/home/yagnihotri/projects/deepcorr/dataset/8802_tordata300.pickle', 'rb'))
 
@@ -60,3 +60,5 @@ else:
     test_index = load_test_index_deepcorr(path_of_saved_run)
 
     train_flow_before, train_label, dropout_keep_prob, saver, predict, graph = build_graph_testing(batch_size_testing, flow_size)
+
+    test_model(dataset, test_index, flow_size, negative_samples, batch_size_testing, train_flow_before, train_label, dropout_keep_prob, saver, predict, graph, path_of_saved_run)
