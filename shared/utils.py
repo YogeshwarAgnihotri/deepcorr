@@ -2,7 +2,6 @@ import os
 import logging
 import yaml
 import datetime
-import pandas 
 import numpy as np
 import shutil
 
